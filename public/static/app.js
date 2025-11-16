@@ -2,9 +2,43 @@
 let allPlatforms = [];
 let currentFilter = 'all';
 let searchQuery = '';
+let favorites = [];
+
+// Load favorites from localStorage
+function loadFavorites() {
+    const saved = localStorage.getItem('ai_command_center_favorites');
+    favorites = saved ? JSON.parse(saved) : [];
+}
+
+// Save favorites to localStorage
+function saveFavorites() {
+    localStorage.setItem('ai_command_center_favorites', JSON.stringify(favorites));
+}
+
+// Check if platform is favorite
+function isFavorite(platformId) {
+    return favorites.includes(platformId);
+}
+
+// Toggle favorite
+function toggleFavorite(platformId) {
+    if (isFavorite(platformId)) {
+        favorites = favorites.filter(id => id !== platformId);
+    } else {
+        favorites.push(platformId);
+    }
+    saveFavorites();
+    renderPlatforms(currentFilter === 'favorites' ? getFavorites() : filterPlatforms());
+}
+
+// Get favorite platforms
+function getFavorites() {
+    return allPlatforms.filter(p => isFavorite(p.id));
+}
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+    loadFavorites();
     loadPlatforms();
     setupEventListeners();
 });
@@ -106,13 +140,19 @@ function renderFilterTabs(categories) {
         </button>
     `;
     
+    const favoritesTabHTML = `
+        <button class="filter-tab px-6 py-3 rounded-xl bg-dark border border-purple-500/30 text-gray-300 hover:bg-purple-600/20 hover:text-white font-semibold transition-all" data-category="favorites">
+            <i class="fas fa-heart mr-2"></i>Favorites <span class="ml-2 text-xs opacity-75">(${favorites.length})</span>
+        </button>
+    `;
+    
     const categoryTabsHTML = categories.map(cat => `
         <button class="filter-tab px-6 py-3 rounded-xl bg-dark border border-purple-500/30 text-gray-300 hover:bg-purple-600/20 hover:text-white font-semibold transition-all" data-category="${cat.name}">
             <i class="${getCategoryIcon(cat.name)} mr-2"></i>${cat.name} <span class="ml-2 text-xs opacity-75">(${cat.count})</span>
         </button>
     `).join('');
     
-    document.getElementById('filterTabs').innerHTML = allTabHTML + categoryTabsHTML;
+    document.getElementById('filterTabs').innerHTML = allTabHTML + favoritesTabHTML + categoryTabsHTML;
     
     // Add click listeners
     document.querySelectorAll('.filter-tab').forEach(tab => {
@@ -125,7 +165,11 @@ function renderFilterTabs(categories) {
             tab.classList.remove('bg-dark', 'border', 'border-purple-500/30', 'text-gray-300');
             
             currentFilter = tab.dataset.category;
-            filterPlatforms();
+            if (currentFilter === 'favorites') {
+                renderPlatforms(getFavorites());
+            } else {
+                filterPlatforms();
+            }
         });
     });
 }
@@ -182,8 +226,12 @@ function renderPlatforms(platforms) {
     document.getElementById('emptyState').classList.add('hidden');
     
     const platformsHTML = platforms.map(platform => `
-        <div class="platform-card rounded-xl p-6 card-hover cursor-pointer" onclick="showPlatformDetail(${platform.id})">
-            <div class="flex items-start justify-between mb-4">
+        <div class="platform-card rounded-xl p-6 card-hover relative">
+            <button onclick="event.stopPropagation(); toggleFavorite(${platform.id})" class="absolute top-4 right-4 text-2xl transition-all hover:scale-110" title="${isFavorite(platform.id) ? 'Remove from favorites' : 'Add to favorites'}">
+                <i class="fa${isFavorite(platform.id) ? 's' : 'r'} fa-heart text-${isFavorite(platform.id) ? 'pink' : 'gray'}-400"></i>
+            </button>
+            
+            <div class="flex items-start justify-between mb-4 pr-10">
                 <div class="flex-1">
                     <h3 class="text-lg font-bold text-white mb-2 line-clamp-2">${platform.name}</h3>
                     <div class="flex flex-wrap gap-2 mb-3">
@@ -211,19 +259,25 @@ function renderPlatforms(platforms) {
                 </div>
             ` : ''}
             
-            <div class="flex items-center justify-between pt-4 border-t border-purple-500/20">
-                <span class="text-xs text-gray-500">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    ${platform.details.length} details
-                </span>
-                <button class="text-purple-400 hover:text-purple-300 transition-colors text-sm font-semibold">
-                    View Details <i class="fas fa-arrow-right ml-1"></i>
+            <div class="flex gap-2 pt-4 border-t border-purple-500/20">
+                ${platform.url ? `
+                    <button onclick="event.stopPropagation(); launchPlatform('${platform.url}')" class="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white text-sm font-semibold transition-all">
+                        <i class="fas fa-rocket mr-2"></i>Launch
+                    </button>
+                ` : ''}
+                <button onclick="showPlatformDetail(${platform.id})" class="flex-1 px-4 py-2 bg-dark border border-purple-500/30 hover:bg-purple-600/20 rounded-lg text-purple-400 text-sm font-semibold transition-all">
+                    <i class="fas fa-info-circle mr-2"></i>Details
                 </button>
             </div>
         </div>
     `).join('');
     
     container.innerHTML = platformsHTML;
+}
+
+// Launch platform
+function launchPlatform(url) {
+    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 // Show platform detail modal
@@ -292,13 +346,15 @@ function showPlatformDetail(platformId) {
                 Quick Actions
             </h4>
             <div class="flex flex-wrap gap-2">
-                <button class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white text-sm transition-colors">
-                    <i class="fas fa-rocket mr-2"></i>Launch Platform
+                ${platform.url ? `
+                    <button onclick="launchPlatform('${platform.url}')" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white text-sm font-semibold transition-all">
+                        <i class="fas fa-rocket mr-2"></i>Launch Platform
+                    </button>
+                ` : ''}
+                <button onclick="toggleFavorite(${platform.id}); showPlatformDetail(${platform.id})" class="px-4 py-2 bg-${isFavorite(platform.id) ? 'pink' : 'gray'}-600 hover:bg-${isFavorite(platform.id) ? 'pink' : 'gray'}-700 rounded-lg text-white text-sm font-semibold transition-all">
+                    <i class="fa${isFavorite(platform.id) ? 's' : 'r'} fa-heart mr-2"></i>${isFavorite(platform.id) ? 'Remove from' : 'Add to'} Favorites
                 </button>
-                <button class="px-4 py-2 bg-pink-600 hover:bg-pink-700 rounded-lg text-white text-sm transition-colors">
-                    <i class="fas fa-star mr-2"></i>Add to Favorites
-                </button>
-                <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm transition-colors">
+                <button onclick="sharePlatform(${platform.id})" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm font-semibold transition-all">
                     <i class="fas fa-share-alt mr-2"></i>Share
                 </button>
             </div>
@@ -337,5 +393,42 @@ function showError(message) {
     `;
 }
 
-// Make function globally available
+// Share platform
+function sharePlatform(platformId) {
+    const platform = allPlatforms.find(p => p.id === platformId);
+    if (!platform) return;
+    
+    const shareText = `Check out ${platform.name}!${platform.url ? '\n\n' + platform.url : ''}`;
+    const shareUrl = window.location.href;
+    
+    // Check if Web Share API is available
+    if (navigator.share) {
+        navigator.share({
+            title: platform.name,
+            text: shareText,
+            url: platform.url || shareUrl
+        }).then(() => {
+            console.log('Successfully shared');
+        }).catch((error) => {
+            console.log('Error sharing:', error);
+            fallbackShare(shareText);
+        });
+    } else {
+        fallbackShare(shareText);
+    }
+}
+
+// Fallback share method
+function fallbackShare(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Link copied to clipboard!');
+    }).catch(() => {
+        alert(`Share this:\n\n${text}`);
+    });
+}
+
+// Make functions globally available
 window.showPlatformDetail = showPlatformDetail;
+window.launchPlatform = launchPlatform;
+window.toggleFavorite = toggleFavorite;
+window.sharePlatform = sharePlatform;

@@ -2,8 +2,21 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-workers'
 import platformsDataRaw from '../platforms_data.json?raw'
+import platformsUrlsRaw from '../platforms_urls.json?raw'
 
 const platformsData = JSON.parse(platformsDataRaw)
+const platformsUrls = JSON.parse(platformsUrlsRaw)
+
+// Add URLs to platform data
+const enrichedPlatforms = platformsData.map(p => {
+  const urlData = platformsUrls[p.id.toString()]
+  return {
+    ...p,
+    url: urlData?.url || null,
+    loginUrl: urlData?.loginUrl || null,
+    description: urlData?.description || p.name
+  }
+})
 
 const app = new Hono()
 
@@ -17,14 +30,14 @@ app.use('/static/*', serveStatic({ root: './public' }))
 app.get('/api/platforms', (c) => {
   return c.json({
     success: true,
-    total: platformsData.length,
-    platforms: platformsData
+    total: enrichedPlatforms.length,
+    platforms: enrichedPlatforms
   })
 })
 
 app.get('/api/platforms/:id', (c) => {
   const id = parseInt(c.req.param('id'))
-  const platform = platformsData.find(p => p.id === id)
+  const platform = enrichedPlatforms.find(p => p.id === id)
   
   if (!platform) {
     return c.json({ success: false, error: 'Platform not found' }, 404)
@@ -34,14 +47,15 @@ app.get('/api/platforms/:id', (c) => {
 })
 
 app.get('/api/categories', (c) => {
-  const categories = [...new Set(platformsData.map(p => p.category))]
+  const categories = [...new Set(enrichedPlatforms.map(p => p.category))]
   const categoryCounts = categories.map(cat => ({
     name: cat,
-    count: platformsData.filter(p => p.category === cat).length,
-    platforms: platformsData.filter(p => p.category === cat).map(p => ({
+    count: enrichedPlatforms.filter(p => p.category === cat).length,
+    platforms: enrichedPlatforms.filter(p => p.category === cat).map(p => ({
       id: p.id,
       name: p.name,
-      pricing: p.pricing
+      pricing: p.pricing,
+      url: p.url
     }))
   }))
   
@@ -58,7 +72,7 @@ app.get('/api/search', (c) => {
     return c.json({ success: false, error: 'Query parameter required' }, 400)
   }
   
-  const results = platformsData.filter(p => 
+  const results = enrichedPlatforms.filter(p => 
     p.name.toLowerCase().includes(query) ||
     p.category.toLowerCase().includes(query) ||
     p.models.some(m => m.toLowerCase().includes(query)) ||
@@ -74,15 +88,15 @@ app.get('/api/search', (c) => {
 })
 
 app.get('/api/stats', (c) => {
-  const totalPlatforms = platformsData.length
-  const paidPlatforms = platformsData.filter(p => p.pricing).length
-  const freePlatforms = platformsData.filter(p => !p.pricing).length
-  const withApiAccess = platformsData.filter(p => p.api_access).length
-  const totalModels = platformsData.reduce((acc, p) => acc + p.models.length, 0)
+  const totalPlatforms = enrichedPlatforms.length
+  const paidPlatforms = enrichedPlatforms.filter(p => p.pricing).length
+  const freePlatforms = enrichedPlatforms.filter(p => !p.pricing).length
+  const withApiAccess = enrichedPlatforms.filter(p => p.api_access).length
+  const totalModels = enrichedPlatforms.reduce((acc, p) => acc + p.models.length, 0)
   
-  const categories = [...new Set(platformsData.map(p => p.category))].map(cat => ({
+  const categories = [...new Set(enrichedPlatforms.map(p => p.category))].map(cat => ({
     name: cat,
-    count: platformsData.filter(p => p.category === cat).length
+    count: enrichedPlatforms.filter(p => p.category === cat).length
   }))
   
   return c.json({
