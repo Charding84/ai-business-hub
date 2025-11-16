@@ -199,37 +199,66 @@ app.get('/', (c) => {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#8b5cf6',
-                        secondary: '#ec4899',
-                        dark: '#0f172a',
-                        darker: '#020617'
+                        primary: '#14b8a6',
+                        secondary: '#06b6d4',
+                        dark: '#0a0a0a',
+                        darker: '#000000',
+                        neonTeal: '#00ffd5',
+                        neonCyan: '#00e5ff'
                     }
                 }
             }
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@600;700&display=swap');
         * { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Rajdhani', sans-serif; font-weight: 700; letter-spacing: 0.5px; }
         
         .gradient-text {
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            background: linear-gradient(135deg, #00ffd5 0%, #00e5ff 50%, #14b8a6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 213, 0.3);
         }
         
         .card-hover {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(20, 184, 166, 0.2);
         }
         
         .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.3);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 255, 213, 0.4), 
+                        0 0 30px rgba(0, 255, 213, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 255, 213, 0.6);
         }
         
         .glow {
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 30px rgba(0, 255, 213, 0.6), 
+                        0 0 60px rgba(0, 255, 213, 0.4),
+                        inset 0 0 20px rgba(0, 255, 213, 0.2);
+            border: 2px solid rgba(0, 255, 213, 0.5);
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 20px rgba(0, 255, 213, 0.8),
+                         0 0 40px rgba(0, 255, 213, 0.4),
+                         0 0 60px rgba(0, 255, 213, 0.2);
+        }
+        
+        .neon-border {
+            border: 2px solid rgba(0, 255, 213, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 213, 0.2),
+                        inset 0 0 10px rgba(0, 255, 213, 0.1);
+        }
+        
+        .neon-border:hover {
+            border-color: rgba(0, 255, 213, 0.8);
+            box-shadow: 0 0 20px rgba(0, 255, 213, 0.5),
+                        inset 0 0 20px rgba(0, 255, 213, 0.2);
         }
         
         .loading {
@@ -251,79 +280,121 @@ app.get('/', (c) => {
         }
         
         .stat-card {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            background: linear-gradient(135deg, rgba(0, 255, 213, 0.08) 0%, rgba(0, 229, 255, 0.08) 100%);
+            border: 1px solid rgba(0, 255, 213, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 213, 0.1);
         }
         
         .platform-card {
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 213, 0.2);
         }
         
         .category-badge {
-            background: rgba(139, 92, 246, 0.2);
-            color: #a78bfa;
+            background: rgba(0, 255, 213, 0.15);
+            color: #00ffd5;
+            border: 1px solid rgba(0, 255, 213, 0.3);
         }
         
         .api-badge {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
+            background: rgba(0, 229, 255, 0.15);
+            color: #00e5ff;
+            border: 1px solid rgba(0, 229, 255, 0.3);
         }
         
         .price-badge {
-            background: rgba(236, 72, 153, 0.2);
-            color: #f472b6;
+            background: rgba(20, 184, 166, 0.15);
+            color: #14b8a6;
+            border: 1px solid rgba(20, 184, 166, 0.3);
         }
         
         .scrollbar-custom::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
         
         .scrollbar-custom::-webkit-scrollbar-track {
-            background: rgba(139, 92, 246, 0.1);
-            border-radius: 4px;
+            background: rgba(0, 255, 213, 0.05);
+            border-radius: 5px;
         }
         
         .scrollbar-custom::-webkit-scrollbar-thumb {
-            background: rgba(139, 92, 246, 0.5);
-            border-radius: 4px;
+            background: linear-gradient(180deg, #00ffd5 0%, #00e5ff 100%);
+            border-radius: 5px;
+            border: 2px solid #000;
         }
         
         .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-            background: rgba(139, 92, 246, 0.7);
+            background: linear-gradient(180deg, #00e5ff 0%, #14b8a6 100%);
+            box-shadow: 0 0 10px rgba(0, 255, 213, 0.5);
+        }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 255, 213, 0.4),
+                            0 0 40px rgba(0, 255, 213, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 255, 213, 0.6),
+                            0 0 60px rgba(0, 255, 213, 0.4);
+            }
+        }
+        
+        .nike-button {
+            background: linear-gradient(135deg, #00ffd5 0%, #00e5ff 100%);
+            color: #000;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(0, 255, 213, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nike-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 255, 213, 0.7),
+                        0 10px 20px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
-<body class="bg-darker text-gray-100 min-h-screen">
+<body class="bg-black text-white min-h-screen" style="background: linear-gradient(to bottom, #000000 0%, #0a0a0a 100%);">
     <!-- Header -->
-    <header class="bg-dark border-b border-purple-500/20 sticky top-0 z-50 backdrop-blur-lg">
+    <header class="bg-black border-b border-[#00ffd5]/30 sticky top-0 z-50 backdrop-blur-lg neon-border">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center glow">
-                        <i class="fas fa-robot text-2xl text-white"></i>
+                    <div class="w-14 h-14 bg-gradient-to-br from-[#00ffd5] to-[#00e5ff] rounded-2xl flex items-center justify-center glow pulse-glow">
+                        <i class="fas fa-robot text-3xl text-black"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold gradient-text">AI Command Center</h1>
-                        <p class="text-sm text-gray-400">Unified Platform Control</p>
+                        <h1 class="text-3xl font-bold gradient-text glow-text tracking-wide">AI COMMAND CENTER</h1>
+                        <p class="text-sm text-[#00ffd5]/70 font-semibold tracking-wider">UNIFIED PLATFORM CONTROL</p>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <div id="statsPreview" class="hidden md:flex items-center space-x-6 text-sm">
+                    <div id="statsPreview" class="hidden md:flex items-center space-x-8 text-sm">
                         <div class="flex items-center space-x-2">
-                            <i class="fas fa-server text-purple-400"></i>
-                            <span class="text-gray-400">Platforms: <span id="totalPlatforms" class="text-white font-semibold">0</span></span>
+                            <i class="fas fa-server text-[#00ffd5] text-lg"></i>
+                            <span class="text-gray-500">PLATFORMS: <span id="totalPlatforms" class="text-[#00ffd5] font-bold">0</span></span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <i class="fas fa-brain text-pink-400"></i>
-                            <span class="text-gray-400">Models: <span id="totalModels" class="text-white font-semibold">0</span></span>
+                            <i class="fas fa-brain text-[#00e5ff] text-lg"></i>
+                            <span class="text-gray-500">MODELS: <span id="totalModels" class="text-[#00e5ff] font-bold">0</span></span>
                         </div>
                     </div>
                     
-                    <button id="refreshBtn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors">
-                        <i class="fas fa-sync-alt"></i>
+                    <button id="refreshBtn" class="nike-button px-6 py-2 rounded-lg transition-all">
+                        <i class="fas fa-sync-alt mr-2"></i>REFRESH
                     </button>
                 </div>
             </div>
@@ -334,14 +405,14 @@ app.get('/', (c) => {
     <main class="container mx-auto px-4 py-8">
         <!-- Search Bar -->
         <div class="mb-8">
-            <div class="relative max-w-2xl mx-auto">
+            <div class="relative max-w-3xl mx-auto">
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="Search platforms, models, capabilities..." 
-                    class="w-full px-6 py-4 bg-dark border border-purple-500/30 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder-gray-500 transition-all"
+                    placeholder="SEARCH PLATFORMS, MODELS, CAPABILITIES..." 
+                    class="w-full px-6 py-5 bg-black/80 border-2 border-[#00ffd5]/30 rounded-2xl focus:outline-none focus:border-[#00ffd5] focus:ring-4 focus:ring-[#00ffd5]/20 text-white placeholder-gray-600 transition-all font-semibold neon-border"
                 />
-                <i class="fas fa-search absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                <i class="fas fa-search absolute right-6 top-1/2 transform -translate-y-1/2 text-[#00ffd5] text-xl"></i>
             </div>
         </div>
 
@@ -352,9 +423,9 @@ app.get('/', (c) => {
 
         <!-- Filter Tabs -->
         <div class="mb-8">
-            <div class="flex flex-wrap gap-2" id="filterTabs">
-                <button class="filter-tab active px-6 py-3 rounded-xl bg-purple-600 text-white font-semibold transition-all" data-category="all">
-                    <i class="fas fa-th mr-2"></i>All Platforms
+            <div class="flex flex-wrap gap-3" id="filterTabs">
+                <button class="filter-tab active nike-button px-8 py-3 rounded-xl font-bold transition-all tracking-wide" data-category="all">
+                    <i class="fas fa-th mr-2"></i>ALL PLATFORMS
                 </button>
             </div>
         </div>
@@ -380,20 +451,20 @@ app.get('/', (c) => {
     </main>
 
     <!-- Platform Detail Modal -->
-    <div id="platformModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-dark border border-purple-500/30 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div class="p-6 border-b border-purple-500/20">
+    <div id="platformModal" class="modal-overlay fixed inset-0 hidden items-center justify-center z-50 p-4">
+        <div class="bg-black border-2 border-[#00ffd5]/50 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden glow">
+            <div class="p-6 border-b-2 border-[#00ffd5]/30">
                 <div class="flex items-start justify-between">
                     <div>
-                        <h2 id="modalTitle" class="text-2xl font-bold gradient-text mb-2"></h2>
+                        <h2 id="modalTitle" class="text-3xl font-bold gradient-text glow-text mb-2"></h2>
                         <div id="modalBadges" class="flex flex-wrap gap-2"></div>
                     </div>
-                    <button id="closeModal" class="text-gray-400 hover:text-white transition-colors">
-                        <i class="fas fa-times text-2xl"></i>
+                    <button id="closeModal" class="text-[#00ffd5] hover:text-white transition-colors">
+                        <i class="fas fa-times text-3xl"></i>
                     </button>
                 </div>
             </div>
-            <div id="modalContent" class="p-6 overflow-y-auto max-h-[calc(90vh-200px)] scrollbar-custom"></div>
+            <div id="modalContent" class="p-6 overflow-y-auto max-h-[calc(90vh-200px)] scrollbar-custom bg-black/50"></div>
         </div>
     </div>
 
