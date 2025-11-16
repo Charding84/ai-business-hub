@@ -1,62 +1,112 @@
 {
   "1": {
-    "bestFor": ["Reasoning", "Complex analysis", "Research", "Writing", "Coding"],
-    "useCases": ["Deep thinking tasks", "Long-form content", "Technical analysis", "Problem solving"],
-    "strengths": ["196K context", "Adaptive reasoning", "Multi-turn conversations"],
-    "keywords": ["reasoning", "analysis", "coding", "writing", "thinking"]
+    "bestFor": ["Reasoning", "Complex analysis", "Research", "Writing", "Coding", "Image generation"],
+    "useCases": ["Deep thinking tasks", "Long-form content", "Technical analysis", "Creative content", "AI images"],
+    "strengths": ["196K context", "Adaptive reasoning", "DALL-E integration", "Canvas preview"],
+    "keywords": ["reasoning", "analysis", "coding", "writing", "thinking", "image", "dalle"],
+    "deployment": {
+      "canDeploy": false,
+      "type": "preview_only",
+      "description": "Canvas provides preview only, no live deployment"
+    }
   },
   "2": {
-    "bestFor": ["Coding", "Technical writing", "Code review", "Architecture", "Debugging"],
-    "useCases": ["Software development", "Code generation", "Technical documentation", "System design"],
-    "strengths": ["200K context", "Best coding performance", "Projects feature", "Artifacts"],
-    "keywords": ["coding", "development", "programming", "technical", "software"]
+    "bestFor": ["Coding", "Writing", "Analysis", "App creation", "Instant deployment"],
+    "useCases": ["Build hosted apps", "Claude Artifacts", "Extended thinking", "Computer use"],
+    "strengths": ["200K context", "128K output", "Instant hosting", "Computer use"],
+    "keywords": ["coding", "artifacts", "hosting", "thinking", "apps", "deployment"],
+    "deployment": {
+      "canDeploy": true,
+      "type": "instant_hosting",
+      "description": "Claude Artifacts - instant hosted apps, no setup required"
+    }
   },
   "3": {
-    "bestFor": ["Research", "Real-time info", "Fact-checking", "News", "Citations"],
-    "useCases": ["Market research", "Current events", "Academic research", "Competitive analysis"],
-    "strengths": ["600+ searches/day", "Real-time web access", "Citations", "Multi-source"],
-    "keywords": ["research", "search", "facts", "news", "citations", "web"]
+    "bestFor": ["Multi-AI workflows", "Web apps", "Live deployment", "Document creation", "Design"],
+    "useCases": ["One-click publish", "AI orchestration", "Full-stack apps", "Slides/Sheets/Docs"],
+    "strengths": ["9 AI models", "80+ tools", "Instant deployment", "Multi-modal"],
+    "keywords": ["deployment", "orchestration", "website", "publish", "multi-ai", "developer"],
+    "deployment": {
+      "canDeploy": true,
+      "type": "one_click_publish",
+      "description": "GenSpark AI Developer - one-click publish to live URL"
+    }
   },
   "4": {
-    "bestFor": ["Image generation", "Video creation", "Design assets", "Audio generation"],
-    "useCases": ["Marketing materials", "Social media content", "Brand assets", "Creative projects"],
-    "strengths": ["Unlimited generations", "Video+audio", "Multiple AI models", "Commercial use"],
-    "keywords": ["image", "video", "design", "creative", "generate", "audio"]
+    "bestFor": ["Enterprise apps", "Databases", "Cloud deployment", "Research", "Image generation"],
+    "useCases": ["AppSheet apps", "Cloud Run deployment", "NotebookLM research", "Gemini in Workspace"],
+    "strengths": ["Cloud deployment", "Database apps", "2TB storage", "Workspace integration"],
+    "keywords": ["cloud", "appsheet", "database", "deployment", "research", "enterprise", "imagen"],
+    "deployment": {
+      "canDeploy": true,
+      "type": "cloud_run_appsheet",
+      "description": "Deploy to Cloud Run or AppSheet with production databases"
+    }
   },
   "5": {
-    "bestFor": ["Multi-model access", "Model comparison", "Workflow automation"],
-    "useCases": ["Testing multiple AIs", "Finding best model", "Complex workflows"],
-    "strengths": ["50+ models", "Context switching", "Workspaces", "Document editor"],
-    "keywords": ["multi-model", "comparison", "workflow", "aggregator"]
+    "bestFor": ["Office productivity", "Document automation", "Email management", "Presentations"],
+    "useCases": ["Word automation", "Excel analysis", "PowerPoint creation", "Outlook assistance"],
+    "strengths": ["Office integration", "Agent Mode", "Designer credits", "SharePoint"],
+    "keywords": ["office", "word", "excel", "powerpoint", "outlook", "productivity", "microsoft"],
+    "deployment": {
+      "canDeploy": false,
+      "type": "office_apps",
+      "description": "Works within Microsoft 365 apps, no external deployment"
+    }
   },
   "6": {
-    "bestFor": ["Research pages", "Multi-agent tasks", "Content creation", "Presentations"],
-    "useCases": ["Sparkpages", "Super Agent workflows", "Team collaboration"],
-    "strengths": ["Unlimited usage", "Multi-model", "Creative suite", "80+ integrations"],
-    "keywords": ["research", "agent", "content", "collaboration", "slides"]
+    "bestFor": ["Research", "Deep search", "Multi-source analysis", "Fact-checking"],
+    "useCases": ["Academic research", "Market research", "Deep dive analysis", "Multi-model routing"],
+    "strengths": ["Deep Research", "Pro Search", "Multi-model", "App connectors"],
+    "keywords": ["research", "search", "analysis", "sources", "deep", "multi-model"],
+    "deployment": {
+      "canDeploy": false,
+      "type": "research_only",
+      "description": "Research platform, no app deployment"
+    }
   },
   "7": {
-    "bestFor": ["Office productivity", "Email", "Documents", "Spreadsheets", "Teams"],
-    "useCases": ["Business documents", "Data analysis", "Email management", "Team collaboration"],
-    "strengths": ["Full Office suite", "GPT-5 integration", "Voice features", "Agents"],
-    "keywords": ["office", "productivity", "email", "documents", "excel", "word"]
+    "bestFor": ["Commercial images", "Brand assets", "Marketing materials", "Safe generation"],
+    "useCases": ["Commercial art", "Marketing visuals", "Brand content", "Generative fill"],
+    "strengths": ["Commercial-safe", "Firefly Image 5", "Adobe Express", "No copyright issues"],
+    "keywords": ["image", "commercial", "firefly", "safe", "marketing", "design", "adobe"],
+    "deployment": {
+      "canDeploy": false,
+      "type": "design_platform",
+      "description": "Design platform, exports files not apps"
+    }
   },
   "8": {
-    "bestFor": ["Cloud storage", "Photos", "Gmail", "Gemini AI", "Workspace"],
-    "useCases": ["File storage", "Photo editing", "Email", "Cloud computing"],
-    "strengths": ["5TB storage", "Gemini 2.5 Pro", "Google Workspace", "Firebase"],
-    "keywords": ["storage", "cloud", "photos", "email", "workspace", "gemini"]
+    "bestFor": ["Multi-model access", "Workflow automation", "Team collaboration", "Model comparison"],
+    "useCases": ["Access 50+ models", "Custom workflows", "MCP integration", "Team workspaces"],
+    "strengths": ["50+ models", "One interface", "Custom workflows", "MCP integration"],
+    "keywords": ["multi-model", "orchestration", "workflow", "mcp", "team", "automation"],
+    "deployment": {
+      "canDeploy": false,
+      "type": "orchestration",
+      "description": "Orchestration platform, no direct deployment"
+    }
   },
   "9": {
-    "bestFor": ["Graphic design", "Social media", "Presentations", "Marketing", "Branding"],
-    "useCases": ["Social posts", "Presentations", "Marketing materials", "Brand kits"],
-    "strengths": ["AI design suite", "Templates", "Collaboration", "Publishing"],
-    "keywords": ["design", "graphics", "social", "marketing", "branding", "templates"]
+    "bestFor": ["Coding", "Development", "Multi-file edits", "Code generation"],
+    "useCases": ["Full-stack development", "Code completion", "Agent mode", "Live preview"],
+    "strengths": ["Multi-agent planning", "Context-aware", "Live preview", "Voice mode"],
+    "keywords": ["coding", "development", "composer", "agent", "code", "programming"],
+    "deployment": {
+      "canDeploy": true,
+      "type": "local_execution",
+      "description": "Local code execution and live preview, no cloud hosting"
+    }
   },
   "10": {
-    "bestFor": ["Professional design", "Photo editing", "Vector graphics", "Publishing"],
-    "useCases": ["Print design", "Photo retouching", "Logo design", "Layout design"],
-    "strengths": ["Free forever", "Professional tools", "Adobe alternative"],
-    "keywords": ["photo", "vector", "graphics", "professional", "design", "editing"]
+    "bestFor": ["Design", "Social media", "Marketing", "Brand materials", "Video editing"],
+    "useCases": ["Social posts", "Presentations", "Marketing materials", "Brand kits", "Video content"],
+    "strengths": ["100M+ assets", "Brand Kit", "Video editor", "AI generation", "Unlimited storage"],
+    "keywords": ["design", "canva", "social", "marketing", "brand", "video", "graphics"],
+    "deployment": {
+      "canDeploy": false,
+      "type": "design_platform",
+      "description": "Design platform, exports files (images, videos, HTML)"
+    }
   }
 }

@@ -2,51 +2,51 @@
   "1": {
     "url": "https://chatgpt.com",
     "loginUrl": "https://auth.openai.com/authorize",
-    "description": "Most advanced OpenAI reasoning model"
+    "description": "GPT-5.1 with thinking modes and DALL-E"
   },
   "2": {
     "url": "https://claude.ai",
     "loginUrl": "https://claude.ai/login",
-    "description": "Anthropic's most capable AI assistant"
+    "description": "Claude with Artifacts instant hosting"
   },
   "3": {
-    "url": "https://www.perplexity.ai",
-    "loginUrl": "https://www.perplexity.ai/login",
-    "description": "AI-powered research and search engine"
+    "url": "https://www.genspark.ai",
+    "loginUrl": "https://www.genspark.ai/auth/login",
+    "description": "Multi-AI orchestration with one-click deployment"
   },
   "4": {
-    "url": "https://firefly.adobe.com",
-    "loginUrl": "https://auth.services.adobe.com/en_US/index.html",
-    "description": "Adobe's generative AI for creative work"
+    "url": "https://gemini.google.com",
+    "loginUrl": "https://accounts.google.com",
+    "description": "Gemini 2.5 Pro with Google Workspace integration"
   },
   "5": {
-    "url": "https://magai.co",
-    "loginUrl": "https://app.magai.co/login",
-    "description": "Multi-model AI aggregator platform"
+    "url": "https://copilot.microsoft.com",
+    "loginUrl": "https://login.microsoft.com",
+    "description": "Microsoft 365 Copilot with Office integration"
   },
   "6": {
-    "url": "https://www.genspark.ai",
-    "loginUrl": "https://www.genspark.ai/login",
-    "description": "Unified AI workspace with Super Agent"
+    "url": "https://www.perplexity.ai",
+    "loginUrl": "https://www.perplexity.ai/login",
+    "description": "Multi-model AI research with deep search"
   },
   "7": {
-    "url": "https://www.microsoft.com/microsoft-365",
-    "loginUrl": "https://login.microsoftonline.com",
-    "description": "Microsoft 365 with Copilot AI"
+    "url": "https://www.adobe.com/products/firefly.html",
+    "loginUrl": "https://auth.adobe.com",
+    "description": "Adobe Firefly commercial-safe image generation"
   },
   "8": {
-    "url": "https://one.google.com",
-    "loginUrl": "https://accounts.google.com",
-    "description": "Google One with Gemini access"
+    "url": "https://magai.co",
+    "loginUrl": "https://app.magai.co/login",
+    "description": "50+ AI models orchestration platform"
   },
   "9": {
-    "url": "https://www.canva.com",
-    "loginUrl": "https://www.canva.com/login",
-    "description": "AI-powered design platform"
+    "url": "https://cursor.sh",
+    "loginUrl": "https://cursor.sh",
+    "description": "AI code editor with multi-agent planning"
   },
   "10": {
-    "url": "https://affinity.serif.com",
-    "loginUrl": "https://affinity.serif.com/en-us/",
-    "description": "Professional design suite (free)"
+    "url": "https://www.canva.com",
+    "loginUrl": "https://www.canva.com/login",
+    "description": "Design platform with AI-powered tools"
   }
 }

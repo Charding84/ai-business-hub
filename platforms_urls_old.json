@@ -1,0 +1,52 @@
+{
+  "1": {
+    "url": "https://chatgpt.com",
+    "loginUrl": "https://auth.openai.com/authorize",
+    "description": "Most advanced OpenAI reasoning model"
+  },
+  "2": {
+    "url": "https://claude.ai",
+    "loginUrl": "https://claude.ai/login",
+    "description": "Anthropic's most capable AI assistant"
+  },
+  "3": {
+    "url": "https://www.perplexity.ai",
+    "loginUrl": "https://www.perplexity.ai/login",
+    "description": "AI-powered research and search engine"
+  },
+  "4": {
+    "url": "https://firefly.adobe.com",
+    "loginUrl": "https://auth.services.adobe.com/en_US/index.html",
+    "description": "Adobe's generative AI for creative work"
+  },
+  "5": {
+    "url": "https://magai.co",
+    "loginUrl": "https://app.magai.co/login",
+    "description": "Multi-model AI aggregator platform"
+  },
+  "6": {
+    "url": "https://www.genspark.ai",
+    "loginUrl": "https://www.genspark.ai/login",
+    "description": "Unified AI workspace with Super Agent"
+  },
+  "7": {
+    "url": "https://www.microsoft.com/microsoft-365",
+    "loginUrl": "https://login.microsoftonline.com",
+    "description": "Microsoft 365 with Copilot AI"
+  },
+  "8": {
+    "url": "https://one.google.com",
+    "loginUrl": "https://accounts.google.com",
+    "description": "Google One with Gemini access"
+  },
+  "9": {
+    "url": "https://www.canva.com",
+    "loginUrl": "https://www.canva.com/login",
+    "description": "AI-powered design platform"
+  },
+  "10": {
+    "url": "https://affinity.serif.com",
+    "loginUrl": "https://affinity.serif.com/en-us/",
+    "description": "Professional design suite (free)"
+  }
+}

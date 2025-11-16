@@ -7,8 +7,10 @@ let recentActivity = [];
 let quickLaunchPlatforms = [];
 let products = [];
 let bundles = [];
-let currentView = 'platforms'; // 'platforms' or 'products'
+let captures = []; // NEW: Capture Library
+let currentView = 'platforms'; // 'platforms', 'products', or 'captures'
 let selectedProducts = []; // For bulk operations
+let captureSearch = ''; // For capture search
 
 // Load favorites from localStorage
 function loadFavorites() {
@@ -201,6 +203,113 @@ function getBundleProducts(bundleId) {
     return products.filter(p => bundle.productIds.includes(p.id));
 }
 
+// ==================== CAPTURE LIBRARY ====================
+
+// Load captures from localStorage
+function loadCaptures() {
+    const saved = localStorage.getItem('ai_business_hub_captures');
+    captures = saved ? JSON.parse(saved) : [];
+}
+
+// Save captures to localStorage
+function saveCaptures() {
+    localStorage.setItem('ai_business_hub_captures', JSON.stringify(captures));
+}
+
+// Add new capture
+function addCapture(captureData) {
+    const capture = {
+        id: Date.now(),
+        type: captureData.type, // 'text', 'image', 'video', 'link', 'code', 'conversation'
+        title: captureData.title || 'Untitled Capture',
+        content: captureData.content || '',
+        platform: captureData.platform || 'Unknown', // Which AI platform
+        platformId: captureData.platformId || null,
+        url: captureData.url || '', // Original URL if applicable
+        tags: captureData.tags || [],
+        notes: captureData.notes || '',
+        favorite: false,
+        useCount: 0,
+        usedIn: [], // Array of product IDs this was used in
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+    captures.unshift(capture); // Add to beginning
+    saveCaptures();
+    return capture;
+}
+
+// Update capture
+function updateCapture(captureId, updates) {
+    const index = captures.findIndex(c => c.id === captureId);
+    if (index !== -1) {
+        captures[index] = {
+            ...captures[index],
+            ...updates,
+            updatedAt: Date.now()
+        };
+        saveCaptures();
+        return captures[index];
+    }
+    return null;
+}
+
+// Delete capture
+function deleteCapture(captureId) {
+    captures = captures.filter(c => c.id !== captureId);
+    saveCaptures();
+}
+
+// Toggle capture favorite
+function toggleCaptureFavorite(captureId) {
+    const capture = captures.find(c => c.id === captureId);
+    if (capture) {
+        capture.favorite = !capture.favorite;
+        capture.updatedAt = Date.now();
+        saveCaptures();
+    }
+}
+
+// Increment use count
+function incrementCaptureUse(captureId, productId = null) {
+    const capture = captures.find(c => c.id === captureId);
+    if (capture) {
+        capture.useCount++;
+        if (productId && !capture.usedIn.includes(productId)) {
+            capture.usedIn.push(productId);
+        }
+        capture.updatedAt = Date.now();
+        saveCaptures();
+    }
+}
+
+// Search captures
+function searchCaptures(query) {
+    if (!query) return captures;
+    const lowerQuery = query.toLowerCase();
+    return captures.filter(c => 
+        c.title.toLowerCase().includes(lowerQuery) ||
+        c.content.toLowerCase().includes(lowerQuery) ||
+        c.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+        c.platform.toLowerCase().includes(lowerQuery)
+    );
+}
+
+// Get captures by type
+function getCapturesByType(type) {
+    return captures.filter(c => c.type === type);
+}
+
+// Get favorite captures
+function getFavoriteCaptures() {
+    return captures.filter(c => c.favorite);
+}
+
+// Get captures by platform
+function getCapturesByPlatform(platformId) {
+    return captures.filter(c => c.platformId === platformId);
+}
+
 // ==================== WORKFLOW TEMPLATES ====================
 
 const workflowTemplates = {
@@ -336,11 +445,13 @@ document.addEventListener('DOMContentLoaded', () => {
     loadQuickLaunch();
     loadProducts();
     loadBundles();
+    loadCaptures();
     loadPlatforms();
     setupEventListeners();
     renderQuickLaunchBar();
     setupSmartAssistant();
     setupProductPipelineButton();
+    setupCaptureLibraryButton();
 });
 
 // Setup event listeners
@@ -2041,6 +2152,512 @@ function generateDescriptions() {
     alert('AI Description Generator coming in next update! This will use your AI platforms to generate marketing copy automatically.');
 }
 
+// ==================== CAPTURE LIBRARY UI ====================
+
+// Setup Capture Library button
+function setupCaptureLibraryButton() {
+    const header = document.querySelector('.max-w-7xl.mx-auto .flex.justify-between');
+    if (!header || document.getElementById('captureLibraryButton')) return;
+    
+    const captureButton = document.createElement('button');
+    captureButton.id = 'captureLibraryButton';
+    captureButton.className = 'px-6 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+    captureButton.innerHTML = '<i class="fas fa-bookmark mr-2"></i>Capture Library';
+    captureButton.onclick = () => switchView('captures');
+    
+    // Insert between Product Pipeline and Smart Assistant buttons
+    const pipelineBtn = document.getElementById('toggleViewButton');
+    if (pipelineBtn) {
+        pipelineBtn.parentNode.insertBefore(captureButton, pipelineBtn.nextSibling);
+    }
+}
+
+// Switch between views
+function switchView(view) {
+    currentView = view;
+    const mainContent = document.getElementById('app');
+    
+    // Update all view buttons
+    const pipelineBtn = document.getElementById('toggleViewButton');
+    const captureBtn = document.getElementById('captureLibraryButton');
+    
+    if (view === 'platforms') {
+        if (pipelineBtn) {
+            pipelineBtn.innerHTML = '<i class="fas fa-briefcase mr-2"></i>Product Pipeline';
+            pipelineBtn.className = 'px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        }
+        if (captureBtn) {
+            captureBtn.className = 'px-6 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        }
+        renderPlatforms(filterPlatforms());
+    } else if (view === 'products') {
+        if (pipelineBtn) {
+            pipelineBtn.innerHTML = '<i class="fas fa-rocket mr-2"></i>AI Platforms';
+            pipelineBtn.className = 'px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        }
+        if (captureBtn) {
+            captureBtn.className = 'px-6 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        }
+        renderProductPipeline();
+    } else if (view === 'captures') {
+        if (pipelineBtn) {
+            pipelineBtn.innerHTML = '<i class="fas fa-briefcase mr-2"></i>Product Pipeline';
+            pipelineBtn.className = 'px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        }
+        if (captureBtn) {
+            captureBtn.className = 'px-6 py-2 bg-gradient-to-r from-cyan-400 to-teal-400 hover:from-cyan-500 hover:to-teal-500 rounded-lg text-black font-bold transition-all shadow-lg';
+        }
+        renderCaptureLibrary();
+    }
+}
+
+// Render Capture Library
+function renderCaptureLibrary() {
+    const mainContent = document.getElementById('app');
+    
+    const textCaptures = getCapturesByType('text');
+    const imageCaptures = getCapturesByType('image');
+    const videoCaptures = getCapturesByType('video');
+    const linkCaptures = getCapturesByType('link');
+    const codeCaptures = getCapturesByType('code');
+    const conversationCaptures = getCapturesByType('conversation');
+    const favoriteCaptures = getFavoriteCaptures();
+    
+    const displayCaptures = captureSearch ? searchCaptures(captureSearch) : captures;
+    
+    mainContent.innerHTML = `
+        <div class="space-y-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2">
+                        <i class="fas fa-bookmark mr-3 text-cyan-400"></i>
+                        Capture Library
+                    </h2>
+                    <p class="text-gray-400">Your centralized hub for AI outputs, prompts, and creative assets</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="showAddCaptureModal()" class="px-6 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>Add Capture
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="bg-dark border border-cyan-500/30 rounded-xl p-4">
+                <div class="flex gap-3">
+                    <div class="flex-1 relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                        <input 
+                            type="text" 
+                            id="captureSearchInput"
+                            value="${captureSearch}"
+                            onkeyup="handleCaptureSearch(event)"
+                            class="w-full pl-12 pr-4 py-3 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none" 
+                            placeholder="Search captures by title, content, tags, or platform..."
+                        >
+                    </div>
+                    <button onclick="clearCaptureSearch()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-7 gap-3">
+                <div class="bg-dark border border-cyan-500/30 rounded-xl p-3 cursor-pointer hover:border-cyan-500 transition-all" onclick="filterCapturesByType('')">
+                    <div class="text-2xl font-bold text-cyan-400">${captures.length}</div>
+                    <div class="text-xs text-gray-400 mt-1">All</div>
+                </div>
+                <div class="bg-dark border border-purple-500/30 rounded-xl p-3 cursor-pointer hover:border-purple-500 transition-all" onclick="filterCapturesByType('text')">
+                    <div class="text-2xl font-bold text-purple-400">${textCaptures.length}</div>
+                    <div class="text-xs text-gray-400 mt-1">💬 Text</div>
+                </div>
+                <div class="bg-dark border border-pink-500/30 rounded-xl p-3 cursor-pointer hover:border-pink-500 transition-all" onclick="filterCapturesByType('image')">
+                    <div class="text-2xl font-bold text-pink-400">${imageCaptures.length}</div>
+                    <div class="text-xs text-gray-400 mt-1">🖼️ Images</div>
+                </div>
+                <div class="bg-dark border border-red-500/30 rounded-xl p-3 cursor-pointer hover:border-red-500 transition-all" onclick="filterCapturesByType('video')">
+                    <div class="text-2xl font-bold text-red-400">${videoCaptures.length}</div>
+                    <div class="text-xs text-gray-400 mt-1">🎥 Videos</div>
+                </div>
+                <div class="bg-dark border border-blue-500/30 rounded-xl p-3 cursor-pointer hover:border-blue-500 transition-all" onclick="filterCapturesByType('link')">
+                    <div class="text-2xl font-bold text-blue-400">${linkCaptures.length}</div>
+                    <div class="text-xs text-gray-400 mt-1">🔗 Links</div>
+                </div>
+                <div class="bg-dark border border-green-500/30 rounded-xl p-3 cursor-pointer hover:border-green-500 transition-all" onclick="filterCapturesByType('code')">
+                    <div class="text-2xl font-bold text-green-400">${codeCaptures.length}</div>
+                    <div class="text-xs text-gray-400 mt-1">💻 Code</div>
+                </div>
+                <div class="bg-dark border border-yellow-500/30 rounded-xl p-3 cursor-pointer hover:border-yellow-500 transition-all" onclick="filterCapturesByType('favorite')">
+                    <div class="text-2xl font-bold text-yellow-400">${favoriteCaptures.length}</div>
+                    <div class="text-xs text-gray-400 mt-1">⭐ Favs</div>
+                </div>
+            </div>
+            
+            <!-- Captures Grid -->
+            <div class="grid grid-cols-3 gap-4">
+                ${displayCaptures.length === 0 ? `
+                    <div class="col-span-3 text-center py-12">
+                        <i class="fas fa-inbox text-6xl text-gray-600 mb-4"></i>
+                        <p class="text-gray-400 text-lg">No captures yet</p>
+                        <p class="text-gray-500 text-sm mt-2">Click "Add Capture" to save your first AI output</p>
+                    </div>
+                ` : displayCaptures.map(capture => renderCaptureCard(capture)).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render individual capture card
+function renderCaptureCard(capture) {
+    const typeIcons = {
+        text: 'fa-comment-dots',
+        image: 'fa-image',
+        video: 'fa-video',
+        link: 'fa-link',
+        code: 'fa-code',
+        conversation: 'fa-comments'
+    };
+    
+    const typeColors = {
+        text: 'purple',
+        image: 'pink',
+        video: 'red',
+        link: 'blue',
+        code: 'green',
+        conversation: 'indigo'
+    };
+    
+    const icon = typeIcons[capture.type] || 'fa-bookmark';
+    const color = typeColors[capture.type] || 'gray';
+    
+    const contentPreview = capture.content.length > 150 
+        ? capture.content.substring(0, 150) + '...' 
+        : capture.content;
+    
+    return `
+        <div class="bg-dark border border-${color}-500/30 rounded-xl p-4 hover:border-${color}-500 transition-all cursor-pointer" onclick="showCaptureDetail(${capture.id})">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas ${icon} text-${color}-400"></i>
+                        <h3 class="font-bold text-white text-sm">${capture.title}</h3>
+                        ${capture.favorite ? '<i class="fas fa-star text-yellow-400 text-xs"></i>' : ''}
+                    </div>
+                    <p class="text-xs text-gray-400 line-clamp-3">${contentPreview}</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 mb-3 text-xs">
+                <span class="badge bg-${color}-600/20 text-${color}-300">${capture.type}</span>
+                <span class="text-gray-500">•</span>
+                <span class="text-gray-500">${capture.platform}</span>
+                ${capture.useCount > 0 ? `
+                    <span class="text-gray-500">•</span>
+                    <span class="text-cyan-400"><i class="fas fa-recycle mr-1"></i>${capture.useCount}x</span>
+                ` : ''}
+            </div>
+            
+            ${capture.tags.length > 0 ? `
+                <div class="flex flex-wrap gap-1 mb-3">
+                    ${capture.tags.slice(0, 3).map(tag => `
+                        <span class="badge bg-gray-700 text-gray-300 text-xs">${tag}</span>
+                    `).join('')}
+                    ${capture.tags.length > 3 ? `<span class="text-xs text-gray-500">+${capture.tags.length - 3}</span>` : ''}
+                </div>
+            ` : ''}
+            
+            <div class="flex gap-2">
+                <button onclick="event.stopPropagation(); copyCaptureToClipboard(${capture.id})" class="flex-1 px-3 py-1 bg-${color}-600/20 hover:bg-${color}-600/40 rounded text-${color}-400 text-xs font-semibold transition-all">
+                    <i class="fas fa-copy mr-1"></i>Copy
+                </button>
+                <button onclick="event.stopPropagation(); toggleCaptureFavorite(${capture.id}); renderCaptureLibrary();" class="px-3 py-1 bg-gray-600/20 hover:bg-gray-600/40 rounded text-gray-400 text-xs font-semibold transition-all">
+                    <i class="fas fa-star"></i>
+                </button>
+            </div>
+            
+            <div class="text-xs text-gray-600 mt-2">${getTimeAgo(capture.createdAt)}</div>
+        </div>
+    `;
+}
+
+// Show Add Capture Modal
+function showAddCaptureModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-3xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-plus-circle mr-2 text-cyan-400"></i>
+                    Add Capture
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleAddCapture(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Title *</label>
+                    <input type="text" id="captureTitle" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none" placeholder="e.g., Instagram Caption Prompt">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Type *</label>
+                    <select id="captureType" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none">
+                        <option value="">Select type...</option>
+                        <option value="text">💬 Text/Prompt</option>
+                        <option value="image">🖼️ Image</option>
+                        <option value="video">🎥 Video</option>
+                        <option value="link">🔗 Link/URL</option>
+                        <option value="code">💻 Code</option>
+                        <option value="conversation">💭 Conversation</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">AI Platform *</label>
+                    <select id="capturePlatform" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none">
+                        <option value="">Select platform...</option>
+                        ${allPlatforms.map(p => `<option value="${p.name}" data-id="${p.id}">${p.name}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Content *</label>
+                    <textarea id="captureContent" required rows="8" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none font-mono text-sm" placeholder="Paste your prompt, AI response, code, or any content here..."></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">URL (optional)</label>
+                    <input type="url" id="captureUrl" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none" placeholder="https://...">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Tags (comma-separated)</label>
+                    <input type="text" id="captureTags" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none" placeholder="e.g., social media, instagram, captions">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Notes</label>
+                    <textarea id="captureNotes" rows="2" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-cyan-500 focus:outline-none" placeholder="Why you saved this, what worked well, etc..."></textarea>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-save mr-2"></i>Save Capture
+                    </button>
+                    <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Handle add capture
+function handleAddCapture(event) {
+    event.preventDefault();
+    
+    const platformSelect = document.getElementById('capturePlatform');
+    const selectedOption = platformSelect.options[platformSelect.selectedIndex];
+    const tagsInput = document.getElementById('captureTags').value;
+    
+    const captureData = {
+        title: document.getElementById('captureTitle').value,
+        type: document.getElementById('captureType').value,
+        platform: platformSelect.value,
+        platformId: selectedOption.dataset.id ? parseInt(selectedOption.dataset.id) : null,
+        content: document.getElementById('captureContent').value,
+        url: document.getElementById('captureUrl').value,
+        tags: tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [],
+        notes: document.getElementById('captureNotes').value
+    };
+    
+    addCapture(captureData);
+    closeModal();
+    
+    if (currentView === 'captures') {
+        renderCaptureLibrary();
+    }
+    
+    showNotification('💾 Capture saved!');
+}
+
+// Show capture detail
+function showCaptureDetail(captureId) {
+    const capture = captures.find(c => c.id === captureId);
+    if (!capture) return;
+    
+    const typeColors = {
+        text: 'purple',
+        image: 'pink',
+        video: 'red',
+        link: 'blue',
+        code: 'green',
+        conversation: 'indigo'
+    };
+    
+    const color = typeColors[capture.type] || 'gray';
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-4xl">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-bold text-white">${capture.title}</h2>
+                    ${capture.favorite ? '<i class="fas fa-star text-yellow-400 text-xl"></i>' : ''}
+                </div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                    <span class="badge bg-${color}-600 text-white">${capture.type}</span>
+                    <span class="text-gray-400">${capture.platform}</span>
+                    ${capture.useCount > 0 ? `<span class="text-cyan-400"><i class="fas fa-recycle mr-1"></i>Reused ${capture.useCount}x</span>` : ''}
+                </div>
+                
+                <div class="bg-darker border border-gray-700 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold text-gray-400 mb-2">Content</h3>
+                    <pre class="text-white whitespace-pre-wrap font-mono text-sm">${capture.content}</pre>
+                </div>
+                
+                ${capture.url ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">URL</h3>
+                        <a href="${capture.url}" target="_blank" class="text-cyan-400 hover:text-cyan-300 break-all">
+                            ${capture.url}
+                        </a>
+                    </div>
+                ` : ''}
+                
+                ${capture.tags.length > 0 ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">Tags</h3>
+                        <div class="flex flex-wrap gap-2">
+                            ${capture.tags.map(tag => `
+                                <span class="badge bg-gray-700 text-gray-300">${tag}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${capture.notes ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">Notes</h3>
+                        <p class="text-gray-300">${capture.notes}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="text-xs text-gray-500">
+                    Created: ${new Date(capture.createdAt).toLocaleString()}
+                    ${capture.updatedAt !== capture.createdAt ? ` • Updated: ${new Date(capture.updatedAt).toLocaleString()}` : ''}
+                </div>
+                
+                <div class="flex gap-3 pt-4 border-t border-gray-700">
+                    <button onclick="copyCaptureToClipboard(${capture.id})" class="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-copy mr-2"></i>Copy Content
+                    </button>
+                    <button onclick="convertCaptureToProduct(${capture.id})" class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-box mr-2"></i>Convert to Product
+                    </button>
+                    <button onclick="deleteCaptureConfirm(${capture.id})" class="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg text-red-400 font-semibold transition-all">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Copy capture to clipboard
+function copyCaptureToClipboard(captureId) {
+    const capture = captures.find(c => c.id === captureId);
+    if (!capture) return;
+    
+    navigator.clipboard.writeText(capture.content).then(() => {
+        incrementCaptureUse(captureId);
+        showNotification('📋 Copied to clipboard!');
+        if (currentView === 'captures') {
+            renderCaptureLibrary();
+        }
+    }).catch(err => {
+        alert('Failed to copy: ' + err);
+    });
+}
+
+// Convert capture to product
+function convertCaptureToProduct(captureId) {
+    const capture = captures.find(c => c.id === captureId);
+    if (!capture) return;
+    
+    const productData = {
+        name: capture.title,
+        type: capture.type === 'text' ? 'prompt' : capture.type,
+        status: 'ready',
+        aiTool: capture.platform,
+        aiToolId: capture.platformId,
+        description: capture.content.substring(0, 200),
+        notes: `Converted from capture. Original notes: ${capture.notes}`,
+        tags: capture.tags
+    };
+    
+    addProduct(productData);
+    incrementCaptureUse(captureId, null);
+    closeModal();
+    showNotification('📦 Converted to product!');
+}
+
+// Delete capture with confirmation
+function deleteCaptureConfirm(captureId) {
+    if (confirm('Are you sure you want to delete this capture?')) {
+        deleteCapture(captureId);
+        closeModal();
+        if (currentView === 'captures') {
+            renderCaptureLibrary();
+        }
+        showNotification('🗑️ Capture deleted');
+    }
+}
+
+// Handle capture search
+function handleCaptureSearch(event) {
+    captureSearch = event.target.value;
+    renderCaptureLibrary();
+}
+
+// Clear capture search
+function clearCaptureSearch() {
+    captureSearch = '';
+    document.getElementById('captureSearchInput').value = '';
+    renderCaptureLibrary();
+}
+
+// Filter captures by type
+let captureTypeFilter = '';
+function filterCapturesByType(type) {
+    captureTypeFilter = type;
+    if (type === 'favorite') {
+        captureSearch = '';
+        renderCaptureLibrary();
+    } else if (type) {
+        captureSearch = '';
+        renderCaptureLibrary();
+    } else {
+        captureSearch = '';
+        renderCaptureLibrary();
+    }
+}
+
 // Make functions globally available
 window.showPlatformDetail = showPlatformDetail;
 window.launchPlatform = launchPlatform;
@@ -2067,6 +2684,16 @@ window.exportToCSV = exportToCSV;
 window.exportToJSON = exportToJSON;
 window.exportGumroadFormat = exportGumroadFormat;
 window.generateDescriptions = generateDescriptions;
+window.switchView = switchView;
+window.showAddCaptureModal = showAddCaptureModal;
+window.handleAddCapture = handleAddCapture;
+window.showCaptureDetail = showCaptureDetail;
+window.copyCaptureToClipboard = copyCaptureToClipboard;
+window.convertCaptureToProduct = convertCaptureToProduct;
+window.deleteCaptureConfirm = deleteCaptureConfirm;
+window.handleCaptureSearch = handleCaptureSearch;
+window.clearCaptureSearch = clearCaptureSearch;
+window.filterCapturesByType = filterCapturesByType;
 window.editProduct = function(productId) {
     alert('Edit functionality coming in next update!');
 };
