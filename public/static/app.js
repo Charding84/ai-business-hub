@@ -5,6 +5,8 @@ let searchQuery = '';
 let favorites = [];
 let recentActivity = [];
 let quickLaunchPlatforms = [];
+let products = [];
+let currentView = 'platforms'; // 'platforms' or 'products'
 
 // Load favorites from localStorage
 function loadFavorites() {
@@ -68,6 +70,73 @@ function saveQuickLaunch() {
     localStorage.setItem('ai_command_center_quicklaunch', JSON.stringify(quickLaunchPlatforms));
 }
 
+// ==================== PRODUCT PIPELINE ====================
+
+// Load products from localStorage
+function loadProducts() {
+    const saved = localStorage.getItem('ai_business_hub_products');
+    products = saved ? JSON.parse(saved) : [];
+}
+
+// Save products to localStorage
+function saveProducts() {
+    localStorage.setItem('ai_business_hub_products', JSON.stringify(products));
+}
+
+// Add new product
+function addProduct(productData) {
+    const product = {
+        id: Date.now(),
+        name: productData.name,
+        type: productData.type, // 'prompt', 'image', 'video', 'tool', 'template', 'course'
+        status: productData.status || 'idea', // 'idea', 'in_progress', 'ready', 'listed'
+        description: productData.description || '',
+        aiTool: productData.aiTool || '', // Which AI was used
+        aiToolId: productData.aiToolId || null,
+        notes: productData.notes || '',
+        price: productData.price || '',
+        tags: productData.tags || [],
+        files: productData.files || [],
+        url: productData.url || '', // If listed, where?
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+    products.push(product);
+    saveProducts();
+    return product;
+}
+
+// Update product
+function updateProduct(productId, updates) {
+    const index = products.findIndex(p => p.id === productId);
+    if (index !== -1) {
+        products[index] = {
+            ...products[index],
+            ...updates,
+            updatedAt: Date.now()
+        };
+        saveProducts();
+        return products[index];
+    }
+    return null;
+}
+
+// Delete product
+function deleteProduct(productId) {
+    products = products.filter(p => p.id !== productId);
+    saveProducts();
+}
+
+// Get products by status
+function getProductsByStatus(status) {
+    return products.filter(p => p.status === status);
+}
+
+// Get products by type
+function getProductsByType(type) {
+    return products.filter(p => p.type === type);
+}
+
 // Check if platform is favorite
 function isFavorite(platformId) {
     return favorites.includes(platformId);
@@ -94,10 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFavorites();
     loadRecentActivity();
     loadQuickLaunch();
+    loadProducts();
     loadPlatforms();
     setupEventListeners();
     renderQuickLaunchBar();
     setupSmartAssistant();
+    setupProductPipelineButton();
 });
 
 // Setup event listeners
@@ -754,6 +825,520 @@ function getTimeAgo(timestamp) {
     return `${Math.floor(seconds / 86400)}d ago`;
 }
 
+// Setup Product Pipeline toggle button
+function setupProductPipelineButton() {
+    const header = document.querySelector('.max-w-7xl.mx-auto .flex.justify-between');
+    if (!header) return;
+    
+    const toggleButton = document.createElement('button');
+    toggleButton.id = 'toggleViewButton';
+    toggleButton.className = 'px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+    toggleButton.innerHTML = '<i class="fas fa-briefcase mr-2"></i>Product Pipeline';
+    toggleButton.onclick = toggleView;
+    
+    header.appendChild(toggleButton);
+}
+
+// Toggle between platforms and products view
+function toggleView() {
+    currentView = currentView === 'platforms' ? 'products' : 'platforms';
+    const button = document.getElementById('toggleViewButton');
+    const mainContent = document.getElementById('app');
+    
+    if (currentView === 'products') {
+        button.innerHTML = '<i class="fas fa-rocket mr-2"></i>AI Platforms';
+        button.className = 'px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        renderProductPipeline();
+    } else {
+        button.innerHTML = '<i class="fas fa-briefcase mr-2"></i>Product Pipeline';
+        button.className = 'px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        renderPlatforms(filterPlatforms());
+    }
+}
+
+// Render Product Pipeline Kanban
+function renderProductPipeline() {
+    const mainContent = document.getElementById('app');
+    
+    const ideasCount = getProductsByStatus('idea').length;
+    const inProgressCount = getProductsByStatus('in_progress').length;
+    const readyCount = getProductsByStatus('ready').length;
+    const listedCount = getProductsByStatus('listed').length;
+    const totalCount = products.length;
+    
+    mainContent.innerHTML = `
+        <div class="space-y-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2">
+                        <i class="fas fa-briefcase mr-3 text-green-400"></i>
+                        Product Pipeline
+                    </h2>
+                    <p class="text-gray-400">Track your digital products from idea to sale</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="showQuickCaptureModal()" class="px-6 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-bolt mr-2"></i>Quick Capture
+                    </button>
+                    <button onclick="showAddProductModal()" class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>Add Product
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-5 gap-4">
+                <div class="bg-dark border border-blue-500/30 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-blue-400">${ideasCount}</div>
+                    <div class="text-sm text-gray-400 mt-1">Ideas</div>
+                </div>
+                <div class="bg-dark border border-yellow-500/30 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-yellow-400">${inProgressCount}</div>
+                    <div class="text-sm text-gray-400 mt-1">In Progress</div>
+                </div>
+                <div class="bg-dark border border-green-500/30 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-green-400">${readyCount}</div>
+                    <div class="text-sm text-gray-400 mt-1">Ready to Sell</div>
+                </div>
+                <div class="bg-dark border border-purple-500/30 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-purple-400">${listedCount}</div>
+                    <div class="text-sm text-gray-400 mt-1">Listed</div>
+                </div>
+                <div class="bg-dark border border-pink-500/30 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-pink-400">${totalCount}</div>
+                    <div class="text-sm text-gray-400 mt-1">Total Products</div>
+                </div>
+            </div>
+            
+            <!-- Kanban Board -->
+            <div class="grid grid-cols-4 gap-4">
+                ${renderPipelineColumn('idea', 'Ideas', 'blue', '💡')}
+                ${renderPipelineColumn('in_progress', 'In Progress', 'yellow', '🚧')}
+                ${renderPipelineColumn('ready', 'Ready to Sell', 'green', '✅')}
+                ${renderPipelineColumn('listed', 'Listed', 'purple', '🚀')}
+            </div>
+        </div>
+    `;
+}
+
+// Render a pipeline column
+function renderPipelineColumn(status, title, color, emoji) {
+    const products = getProductsByStatus(status);
+    
+    return `
+        <div class="bg-dark border border-${color}-500/30 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-${color}-400">
+                    ${emoji} ${title}
+                </h3>
+                <span class="badge bg-${color}-600 text-white">${products.length}</span>
+            </div>
+            
+            <div class="space-y-3 min-h-[400px]">
+                ${products.length === 0 ? `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-inbox text-3xl mb-2"></i>
+                        <p class="text-sm">No products yet</p>
+                    </div>
+                ` : products.map(product => renderProductCard(product, color)).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Render individual product card
+function renderProductCard(product, color) {
+    const typeIcons = {
+        prompt: 'fa-comment-dots',
+        image: 'fa-image',
+        video: 'fa-video',
+        tool: 'fa-tools',
+        template: 'fa-file-alt',
+        course: 'fa-graduation-cap'
+    };
+    
+    const icon = typeIcons[product.type] || 'fa-box';
+    
+    return `
+        <div class="bg-darker border border-${color}-500/20 rounded-lg p-3 hover:border-${color}-500/50 transition-all cursor-pointer" onclick="showProductDetail(${product.id})">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas ${icon} text-${color}-400"></i>
+                        <h4 class="font-semibold text-white text-sm">${product.name}</h4>
+                    </div>
+                    <p class="text-xs text-gray-400 line-clamp-2">${product.description || 'No description'}</p>
+                </div>
+            </div>
+            
+            ${product.aiTool ? `
+                <div class="flex items-center gap-1 text-xs text-gray-500 mb-2">
+                    <i class="fas fa-robot"></i>
+                    <span>${product.aiTool}</span>
+                </div>
+            ` : ''}
+            
+            <div class="flex items-center justify-between text-xs">
+                <span class="badge bg-${color}-600/20 text-${color}-300">${product.type}</span>
+                ${product.price ? `<span class="text-green-400 font-semibold">${product.price}</span>` : ''}
+            </div>
+            
+            <div class="flex gap-2 mt-3">
+                <button onclick="event.stopPropagation(); moveProduct(${product.id}, 'forward')" class="flex-1 px-2 py-1 bg-${color}-600/20 hover:bg-${color}-600/40 rounded text-${color}-400 text-xs font-semibold transition-all">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                ${product.status !== 'idea' ? `
+                    <button onclick="event.stopPropagation(); moveProduct(${product.id}, 'back')" class="flex-1 px-2 py-1 bg-gray-600/20 hover:bg-gray-600/40 rounded text-gray-400 text-xs font-semibold transition-all">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// Move product forward/back in pipeline
+function moveProduct(productId, direction) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const statusFlow = ['idea', 'in_progress', 'ready', 'listed'];
+    const currentIndex = statusFlow.indexOf(product.status);
+    
+    if (direction === 'forward' && currentIndex < statusFlow.length - 1) {
+        updateProduct(productId, { status: statusFlow[currentIndex + 1] });
+    } else if (direction === 'back' && currentIndex > 0) {
+        updateProduct(productId, { status: statusFlow[currentIndex - 1] });
+    }
+    
+    renderProductPipeline();
+}
+
+// Show Add Product Modal
+function showAddProductModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-plus-circle mr-2 text-green-400"></i>
+                    Add New Product
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleAddProduct(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Product Name *</label>
+                    <input type="text" id="productName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none" placeholder="e.g., Instagram Caption Prompt Pack">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Product Type *</label>
+                    <select id="productType" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none">
+                        <option value="">Select type...</option>
+                        <option value="prompt">💬 AI Prompt</option>
+                        <option value="image">🖼️ Image/Digital Art</option>
+                        <option value="video">🎥 Video Content</option>
+                        <option value="tool">🔧 Tool/Script</option>
+                        <option value="template">📄 Template</option>
+                        <option value="course">🎓 Course/Tutorial</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Status *</label>
+                    <select id="productStatus" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none">
+                        <option value="idea">💡 Idea</option>
+                        <option value="in_progress">🚧 In Progress</option>
+                        <option value="ready">✅ Ready to Sell</option>
+                        <option value="listed">🚀 Listed</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">AI Tool Used</label>
+                    <select id="productAiTool" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none">
+                        <option value="">Select AI tool...</option>
+                        ${allPlatforms.map(p => `<option value="${p.name}" data-id="${p.id}">${p.name}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Description</label>
+                    <textarea id="productDescription" rows="3" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none" placeholder="What does this product do?"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Price</label>
+                        <input type="text" id="productPrice" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none" placeholder="e.g., $9.99">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Listing URL</label>
+                        <input type="url" id="productUrl" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none" placeholder="https://...">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Notes</label>
+                    <textarea id="productNotes" rows="2" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-green-500 focus:outline-none" placeholder="Any additional notes..."></textarea>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-check mr-2"></i>Add Product
+                    </button>
+                    <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Handle add product form submission
+function handleAddProduct(event) {
+    event.preventDefault();
+    
+    const aiToolSelect = document.getElementById('productAiTool');
+    const selectedOption = aiToolSelect.options[aiToolSelect.selectedIndex];
+    
+    const productData = {
+        name: document.getElementById('productName').value,
+        type: document.getElementById('productType').value,
+        status: document.getElementById('productStatus').value,
+        aiTool: aiToolSelect.value,
+        aiToolId: selectedOption.dataset.id ? parseInt(selectedOption.dataset.id) : null,
+        description: document.getElementById('productDescription').value,
+        price: document.getElementById('productPrice').value,
+        url: document.getElementById('productUrl').value,
+        notes: document.getElementById('productNotes').value
+    };
+    
+    addProduct(productData);
+    closeModal();
+    renderProductPipeline();
+}
+
+// Show Quick Capture Modal
+function showQuickCaptureModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-lg">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-bolt mr-2 text-yellow-400"></i>
+                    Quick Capture
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleQuickCapture(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Quick Idea *</label>
+                    <input type="text" id="quickCaptureName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-yellow-500 focus:outline-none" placeholder="e.g., Prompt for viral TikTok captions">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Type *</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="selectQuickType('prompt', event)" class="quick-type-btn px-4 py-3 bg-darker border-2 border-gray-700 rounded-lg text-white hover:border-yellow-500 transition-all">
+                            💬 Prompt
+                        </button>
+                        <button type="button" onclick="selectQuickType('image', event)" class="quick-type-btn px-4 py-3 bg-darker border-2 border-gray-700 rounded-lg text-white hover:border-yellow-500 transition-all">
+                            🖼️ Image
+                        </button>
+                        <button type="button" onclick="selectQuickType('video', event)" class="quick-type-btn px-4 py-3 bg-darker border-2 border-gray-700 rounded-lg text-white hover:border-yellow-500 transition-all">
+                            🎥 Video
+                        </button>
+                        <button type="button" onclick="selectQuickType('tool', event)" class="quick-type-btn px-4 py-3 bg-darker border-2 border-gray-700 rounded-lg text-white hover:border-yellow-500 transition-all">
+                            🔧 Tool
+                        </button>
+                        <button type="button" onclick="selectQuickType('template', event)" class="quick-type-btn px-4 py-3 bg-darker border-2 border-gray-700 rounded-lg text-white hover:border-yellow-500 transition-all">
+                            📄 Template
+                        </button>
+                        <button type="button" onclick="selectQuickType('course', event)" class="quick-type-btn px-4 py-3 bg-darker border-2 border-gray-700 rounded-lg text-white hover:border-yellow-500 transition-all">
+                            🎓 Course
+                        </button>
+                    </div>
+                    <input type="hidden" id="quickCaptureType" required>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-bolt mr-2"></i>Capture Idea
+                    </button>
+                    <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Select quick type
+let selectedQuickType = null;
+function selectQuickType(type, event) {
+    event.preventDefault();
+    selectedQuickType = type;
+    document.getElementById('quickCaptureType').value = type;
+    
+    // Update button styles
+    document.querySelectorAll('.quick-type-btn').forEach(btn => {
+        btn.classList.remove('border-yellow-500', 'bg-yellow-600/20');
+        btn.classList.add('border-gray-700');
+    });
+    event.target.classList.remove('border-gray-700');
+    event.target.classList.add('border-yellow-500', 'bg-yellow-600/20');
+}
+
+// Handle quick capture
+function handleQuickCapture(event) {
+    event.preventDefault();
+    
+    const productData = {
+        name: document.getElementById('quickCaptureName').value,
+        type: document.getElementById('quickCaptureType').value,
+        status: 'idea',
+        description: 'Quick capture - add details later'
+    };
+    
+    addProduct(productData);
+    closeModal();
+    
+    if (currentView === 'products') {
+        renderProductPipeline();
+    }
+    
+    // Show success notification
+    showNotification('💡 Idea captured!');
+}
+
+// Show product detail modal
+function showProductDetail(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const statusColors = {
+        idea: 'blue',
+        in_progress: 'yellow',
+        ready: 'green',
+        listed: 'purple'
+    };
+    
+    const color = statusColors[product.status] || 'gray';
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">${product.name}</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                    <span class="badge bg-${color}-600 text-white">${product.status.replace('_', ' ')}</span>
+                    <span class="badge bg-gray-700 text-gray-300">${product.type}</span>
+                    ${product.price ? `<span class="text-green-400 font-semibold text-lg">${product.price}</span>` : ''}
+                </div>
+                
+                ${product.description ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">Description</h3>
+                        <p class="text-white">${product.description}</p>
+                    </div>
+                ` : ''}
+                
+                ${product.aiTool ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">AI Tool Used</h3>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-robot text-purple-400"></i>
+                            <span class="text-white">${product.aiTool}</span>
+                            ${product.aiToolId ? `
+                                <button onclick="launchPlatform('${allPlatforms.find(p => p.id === product.aiToolId)?.url}', ${product.aiToolId})" class="px-3 py-1 bg-purple-600/20 hover:bg-purple-600/40 rounded text-purple-400 text-xs font-semibold transition-all">
+                                    <i class="fas fa-external-link-alt mr-1"></i>Launch
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${product.notes ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">Notes</h3>
+                        <p class="text-gray-300">${product.notes}</p>
+                    </div>
+                ` : ''}
+                
+                ${product.url ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">Listing URL</h3>
+                        <a href="${product.url}" target="_blank" class="text-blue-400 hover:text-blue-300 break-all">
+                            ${product.url}
+                        </a>
+                    </div>
+                ` : ''}
+                
+                <div class="text-xs text-gray-500">
+                    Created: ${new Date(product.createdAt).toLocaleDateString()}
+                    ${product.updatedAt !== product.createdAt ? ` • Updated: ${new Date(product.updatedAt).toLocaleDateString()}` : ''}
+                </div>
+                
+                <div class="flex gap-3 pt-4 border-t border-gray-700">
+                    <button onclick="editProduct(${product.id})" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-edit mr-2"></i>Edit
+                    </button>
+                    <button onclick="deleteProductConfirm(${product.id})" class="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 rounded-lg text-red-400 font-semibold transition-all">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Delete product with confirmation
+function deleteProductConfirm(productId) {
+    if (confirm('Are you sure you want to delete this product?')) {
+        deleteProduct(productId);
+        closeModal();
+        if (currentView === 'products') {
+            renderProductPipeline();
+        }
+        showNotification('🗑️ Product deleted');
+    }
+}
+
+// Show notification
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
 // Make functions globally available
 window.showPlatformDetail = showPlatformDetail;
 window.launchPlatform = launchPlatform;
@@ -761,3 +1346,15 @@ window.toggleFavorite = toggleFavorite;
 window.sharePlatform = sharePlatform;
 window.getRecommendation = getRecommendation;
 window.showSmartAssistant = showSmartAssistant;
+window.toggleView = toggleView;
+window.showAddProductModal = showAddProductModal;
+window.showQuickCaptureModal = showQuickCaptureModal;
+window.handleAddProduct = handleAddProduct;
+window.handleQuickCapture = handleQuickCapture;
+window.selectQuickType = selectQuickType;
+window.showProductDetail = showProductDetail;
+window.moveProduct = moveProduct;
+window.deleteProductConfirm = deleteProductConfirm;
+window.editProduct = function(productId) {
+    alert('Edit functionality coming in next update!');
+};
