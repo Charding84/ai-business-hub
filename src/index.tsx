@@ -3,18 +3,25 @@ import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-workers'
 import platformsDataRaw from '../platforms_data.json?raw'
 import platformsUrlsRaw from '../platforms_urls.json?raw'
+import platformCapabilitiesRaw from '../platform_capabilities.json?raw'
 
 const platformsData = JSON.parse(platformsDataRaw)
 const platformsUrls = JSON.parse(platformsUrlsRaw)
+const platformCapabilities = JSON.parse(platformCapabilitiesRaw)
 
-// Add URLs to platform data
+// Add URLs and capabilities to platform data
 const enrichedPlatforms = platformsData.map(p => {
   const urlData = platformsUrls[p.id.toString()]
+  const capData = platformCapabilities[p.id.toString()]
   return {
     ...p,
     url: urlData?.url || null,
     loginUrl: urlData?.loginUrl || null,
-    description: urlData?.description || p.name
+    description: urlData?.description || p.name,
+    bestFor: capData?.bestFor || [],
+    useCases: capData?.useCases || [],
+    strengths: capData?.strengths || [],
+    keywords: capData?.keywords || []
   }
 })
 
@@ -94,6 +101,14 @@ app.get('/api/stats', (c) => {
   const withApiAccess = enrichedPlatforms.filter(p => p.api_access).length
   const totalModels = enrichedPlatforms.reduce((acc, p) => acc + p.models.length, 0)
   
+  // Calculate total monthly cost
+  const totalMonthlyCost = enrichedPlatforms
+    .filter(p => p.pricing)
+    .reduce((sum, p) => {
+      const price = parseFloat(p.pricing.replace(/[^0-9.]/g, ''))
+      return sum + (isNaN(price) ? 0 : price)
+    }, 0)
+  
   const categories = [...new Set(enrichedPlatforms.map(p => p.category))].map(cat => ({
     name: cat,
     count: enrichedPlatforms.filter(p => p.category === cat).length
@@ -107,8 +122,64 @@ app.get('/api/stats', (c) => {
       freePlatforms,
       withApiAccess,
       totalModels,
+      totalMonthlyCost,
       categories
     }
+  })
+})
+
+// Smart recommendation API
+app.get('/api/recommend', (c) => {
+  const query = c.req.query('task')?.toLowerCase() || ''
+  
+  if (!query) {
+    return c.json({ success: false, error: 'Task parameter required' }, 400)
+  }
+  
+  // Search through capabilities
+  const recommendations = enrichedPlatforms
+    .map(platform => {
+      let score = 0
+      const matches = []
+      
+      // Check keywords
+      platform.keywords?.forEach(keyword => {
+        if (query.includes(keyword)) {
+          score += 3
+          matches.push(`Keyword: ${keyword}`)
+        }
+      })
+      
+      // Check bestFor
+      platform.bestFor?.forEach(skill => {
+        if (query.includes(skill.toLowerCase())) {
+          score += 5
+          matches.push(`Best for: ${skill}`)
+        }
+      })
+      
+      // Check useCases
+      platform.useCases?.forEach(useCase => {
+        if (query.includes(useCase.toLowerCase())) {
+          score += 4
+          matches.push(`Use case: ${useCase}`)
+        }
+      })
+      
+      return { platform, score, matches }
+    })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5)
+  
+  return c.json({
+    success: true,
+    task: query,
+    recommendations: recommendations.map(r => ({
+      platform: r.platform,
+      relevanceScore: r.score,
+      matchReasons: r.matches
+    }))
   })
 })
 

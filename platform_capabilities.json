@@ -1,0 +1,62 @@
+{
+  "1": {
+    "bestFor": ["Reasoning", "Complex analysis", "Research", "Writing", "Coding"],
+    "useCases": ["Deep thinking tasks", "Long-form content", "Technical analysis", "Problem solving"],
+    "strengths": ["196K context", "Adaptive reasoning", "Multi-turn conversations"],
+    "keywords": ["reasoning", "analysis", "coding", "writing", "thinking"]
+  },
+  "2": {
+    "bestFor": ["Coding", "Technical writing", "Code review", "Architecture", "Debugging"],
+    "useCases": ["Software development", "Code generation", "Technical documentation", "System design"],
+    "strengths": ["200K context", "Best coding performance", "Projects feature", "Artifacts"],
+    "keywords": ["coding", "development", "programming", "technical", "software"]
+  },
+  "3": {
+    "bestFor": ["Research", "Real-time info", "Fact-checking", "News", "Citations"],
+    "useCases": ["Market research", "Current events", "Academic research", "Competitive analysis"],
+    "strengths": ["600+ searches/day", "Real-time web access", "Citations", "Multi-source"],
+    "keywords": ["research", "search", "facts", "news", "citations", "web"]
+  },
+  "4": {
+    "bestFor": ["Image generation", "Video creation", "Design assets", "Audio generation"],
+    "useCases": ["Marketing materials", "Social media content", "Brand assets", "Creative projects"],
+    "strengths": ["Unlimited generations", "Video+audio", "Multiple AI models", "Commercial use"],
+    "keywords": ["image", "video", "design", "creative", "generate", "audio"]
+  },
+  "5": {
+    "bestFor": ["Multi-model access", "Model comparison", "Workflow automation"],
+    "useCases": ["Testing multiple AIs", "Finding best model", "Complex workflows"],
+    "strengths": ["50+ models", "Context switching", "Workspaces", "Document editor"],
+    "keywords": ["multi-model", "comparison", "workflow", "aggregator"]
+  },
+  "6": {
+    "bestFor": ["Research pages", "Multi-agent tasks", "Content creation", "Presentations"],
+    "useCases": ["Sparkpages", "Super Agent workflows", "Team collaboration"],
+    "strengths": ["Unlimited usage", "Multi-model", "Creative suite", "80+ integrations"],
+    "keywords": ["research", "agent", "content", "collaboration", "slides"]
+  },
+  "7": {
+    "bestFor": ["Office productivity", "Email", "Documents", "Spreadsheets", "Teams"],
+    "useCases": ["Business documents", "Data analysis", "Email management", "Team collaboration"],
+    "strengths": ["Full Office suite", "GPT-5 integration", "Voice features", "Agents"],
+    "keywords": ["office", "productivity", "email", "documents", "excel", "word"]
+  },
+  "8": {
+    "bestFor": ["Cloud storage", "Photos", "Gmail", "Gemini AI", "Workspace"],
+    "useCases": ["File storage", "Photo editing", "Email", "Cloud computing"],
+    "strengths": ["5TB storage", "Gemini 2.5 Pro", "Google Workspace", "Firebase"],
+    "keywords": ["storage", "cloud", "photos", "email", "workspace", "gemini"]
+  },
+  "9": {
+    "bestFor": ["Graphic design", "Social media", "Presentations", "Marketing", "Branding"],
+    "useCases": ["Social posts", "Presentations", "Marketing materials", "Brand kits"],
+    "strengths": ["AI design suite", "Templates", "Collaboration", "Publishing"],
+    "keywords": ["design", "graphics", "social", "marketing", "branding", "templates"]
+  },
+  "10": {
+    "bestFor": ["Professional design", "Photo editing", "Vector graphics", "Publishing"],
+    "useCases": ["Print design", "Photo retouching", "Logo design", "Layout design"],
+    "strengths": ["Free forever", "Professional tools", "Adobe alternative"],
+    "keywords": ["photo", "vector", "graphics", "professional", "design", "editing"]
+  }
+}
