@@ -6,7 +6,9 @@ let favorites = [];
 let recentActivity = [];
 let quickLaunchPlatforms = [];
 let products = [];
+let bundles = [];
 let currentView = 'platforms'; // 'platforms' or 'products'
+let selectedProducts = []; // For bulk operations
 
 // Load favorites from localStorage
 function loadFavorites() {
@@ -137,6 +139,175 @@ function getProductsByType(type) {
     return products.filter(p => p.type === type);
 }
 
+// ==================== BUNDLES ====================
+
+// Load bundles from localStorage
+function loadBundles() {
+    const saved = localStorage.getItem('ai_business_hub_bundles');
+    bundles = saved ? JSON.parse(saved) : [];
+}
+
+// Save bundles to localStorage
+function saveBundles() {
+    localStorage.setItem('ai_business_hub_bundles', JSON.stringify(bundles));
+}
+
+// Create bundle
+function createBundle(bundleData) {
+    const bundle = {
+        id: Date.now(),
+        name: bundleData.name,
+        type: bundleData.type,
+        productIds: bundleData.productIds || [],
+        description: bundleData.description || '',
+        price: bundleData.price || '',
+        individualPrice: bundleData.individualPrice || '',
+        discount: bundleData.discount || '',
+        status: bundleData.status || 'idea',
+        url: bundleData.url || '',
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+    bundles.push(bundle);
+    saveBundles();
+    return bundle;
+}
+
+// Update bundle
+function updateBundle(bundleId, updates) {
+    const index = bundles.findIndex(b => b.id === bundleId);
+    if (index !== -1) {
+        bundles[index] = {
+            ...bundles[index],
+            ...updates,
+            updatedAt: Date.now()
+        };
+        saveBundles();
+        return bundles[index];
+    }
+    return null;
+}
+
+// Delete bundle
+function deleteBundle(bundleId) {
+    bundles = bundles.filter(b => b.id !== bundleId);
+    saveBundles();
+}
+
+// Get bundle products
+function getBundleProducts(bundleId) {
+    const bundle = bundles.find(b => b.id === bundleId);
+    if (!bundle) return [];
+    return products.filter(p => bundle.productIds.includes(p.id));
+}
+
+// ==================== WORKFLOW TEMPLATES ====================
+
+const workflowTemplates = {
+    'prompt-pack': {
+        name: 'AI Prompt Pack',
+        emoji: '💬',
+        description: 'Create a collection of AI prompts',
+        defaultType: 'prompt',
+        suggestedAIs: [1, 2, 3], // GPT, Claude, Gemini
+        fields: {
+            count: { label: 'Number of Prompts', default: 10 },
+            category: { label: 'Category', default: 'Social Media' },
+            platform: { label: 'Platform', default: 'Instagram' }
+        },
+        pricing: {
+            min: 4.99,
+            max: 19.99,
+            recommended: 9.99
+        }
+    },
+    'social-media-set': {
+        name: 'Social Media Content Set',
+        emoji: '📱',
+        description: 'Create graphics + captions bundle',
+        defaultType: 'image',
+        suggestedAIs: [9, 4, 1], // Canva, Adobe, GPT
+        fields: {
+            count: { label: 'Number of Posts', default: 30 },
+            platform: { label: 'Platform', default: 'Instagram' },
+            style: { label: 'Style', default: 'Modern' }
+        },
+        pricing: {
+            min: 14.99,
+            max: 49.99,
+            recommended: 24.99
+        }
+    },
+    'video-bundle': {
+        name: 'Video Content Bundle',
+        emoji: '🎥',
+        description: 'Create video templates or clips',
+        defaultType: 'video',
+        suggestedAIs: [4, 9], // Adobe, Canva
+        fields: {
+            count: { label: 'Number of Videos', default: 5 },
+            duration: { label: 'Duration', default: '15-30 sec' },
+            platform: { label: 'Platform', default: 'TikTok/Reels' }
+        },
+        pricing: {
+            min: 19.99,
+            max: 79.99,
+            recommended: 39.99
+        }
+    },
+    'template-collection': {
+        name: 'Template Collection',
+        emoji: '📄',
+        description: 'Create design or document templates',
+        defaultType: 'template',
+        suggestedAIs: [9, 4], // Canva, Adobe
+        fields: {
+            count: { label: 'Number of Templates', default: 20 },
+            category: { label: 'Category', default: 'Business' },
+            format: { label: 'Format', default: 'Canva' }
+        },
+        pricing: {
+            min: 9.99,
+            max: 39.99,
+            recommended: 19.99
+        }
+    },
+    'tool-kit': {
+        name: 'Digital Tool Kit',
+        emoji: '🔧',
+        description: 'Create tools, scripts, or utilities',
+        defaultType: 'tool',
+        suggestedAIs: [5, 1, 2], // Cursor, GPT, Claude
+        fields: {
+            count: { label: 'Number of Tools', default: 5 },
+            language: { label: 'Language', default: 'JavaScript' },
+            purpose: { label: 'Purpose', default: 'Automation' }
+        },
+        pricing: {
+            min: 14.99,
+            max: 99.99,
+            recommended: 49.99
+        }
+    },
+    'mini-course': {
+        name: 'Mini Course',
+        emoji: '🎓',
+        description: 'Create educational content',
+        defaultType: 'course',
+        suggestedAIs: [1, 2, 4], // GPT, Claude, Adobe
+        fields: {
+            modules: { label: 'Number of Modules', default: 5 },
+            duration: { label: 'Total Duration', default: '2 hours' },
+            topic: { label: 'Topic', default: 'AI Skills' }
+        },
+        pricing: {
+            min: 29.99,
+            max: 199.99,
+            recommended: 79.99
+        }
+    }
+};
+
 // Check if platform is favorite
 function isFavorite(platformId) {
     return favorites.includes(platformId);
@@ -164,6 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRecentActivity();
     loadQuickLaunch();
     loadProducts();
+    loadBundles();
     loadPlatforms();
     setupEventListeners();
     renderQuickLaunchBar();
@@ -877,12 +1049,21 @@ function renderProductPipeline() {
                     </h2>
                     <p class="text-gray-400">Track your digital products from idea to sale</p>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="showQuickCaptureModal()" class="px-6 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 rounded-lg text-white font-semibold transition-all shadow-lg">
-                        <i class="fas fa-bolt mr-2"></i>Quick Capture
+                <div class="flex gap-2">
+                    <button onclick="showWorkflowTemplatesModal()" class="px-4 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-magic mr-2"></i>Templates
                     </button>
-                    <button onclick="showAddProductModal()" class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg">
-                        <i class="fas fa-plus mr-2"></i>Add Product
+                    <button onclick="showQuickCaptureModal()" class="px-4 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-bolt mr-2"></i>Quick
+                    </button>
+                    <button onclick="showAddProductModal()" class="px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-plus mr-2"></i>Product
+                    </button>
+                    <button onclick="showBundleCreatorModal()" class="px-4 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-box-open mr-2"></i>Bundle
+                    </button>
+                    <button onclick="showExportModal()" class="px-4 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                        <i class="fas fa-download mr-2"></i>Export
                     </button>
                 </div>
             </div>
@@ -1339,6 +1520,527 @@ function showNotification(message) {
     }, 3000);
 }
 
+// ==================== WORKFLOW TEMPLATES MODAL ====================
+
+function showWorkflowTemplatesModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-4xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-magic mr-2 text-indigo-400"></i>
+                    Workflow Templates
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <p class="text-gray-400 mb-6">Choose a template to quickly create product bundles with pre-filled settings and AI suggestions</p>
+            
+            <div class="grid grid-cols-2 gap-4">
+                ${Object.entries(workflowTemplates).map(([key, template]) => `
+                    <div class="bg-dark border border-indigo-500/30 rounded-xl p-4 hover:border-indigo-500 transition-all cursor-pointer" onclick="selectWorkflowTemplate('${key}')">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold text-white">
+                                ${template.emoji} ${template.name}
+                            </h3>
+                            <span class="badge bg-indigo-600 text-white text-xs">$${template.pricing.recommended}</span>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-3">${template.description}</p>
+                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                            <i class="fas fa-robot"></i>
+                            <span>Suggested: ${template.suggestedAIs.map(id => allPlatforms.find(p => p.id === id)?.name.split('(')[0].trim()).filter(Boolean).join(', ')}</span>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-gray-700 text-xs text-gray-500">
+                            Default: ${Object.values(template.fields)[0]?.default} ${Object.values(template.fields)[0]?.label.toLowerCase()}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function selectWorkflowTemplate(templateKey) {
+    closeModal();
+    showWorkflowFormModal(templateKey);
+}
+
+function showWorkflowFormModal(templateKey) {
+    const template = workflowTemplates[templateKey];
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">
+                    ${template.emoji} ${template.name}
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleWorkflowTemplate(event, '${templateKey}')" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Name *</label>
+                    <input type="text" id="workflowName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none" placeholder="e.g., Ultimate ${template.name}">
+                </div>
+                
+                ${Object.entries(template.fields).map(([key, field]) => `
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">${field.label}</label>
+                        <input type="text" id="workflow_${key}" value="${field.default}" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                    </div>
+                `).join('')}
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">AI Tool to Use *</label>
+                    <select id="workflowAiTool" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                        <option value="">Select AI tool...</option>
+                        ${template.suggestedAIs.map(id => {
+                            const platform = allPlatforms.find(p => p.id === id);
+                            return platform ? `<option value="${platform.name}" data-id="${platform.id}" selected>${platform.name} (Recommended)</option>` : '';
+                        }).join('')}
+                        <option disabled>───────────</option>
+                        ${allPlatforms.filter(p => !template.suggestedAIs.includes(p.id)).map(p => `<option value="${p.name}" data-id="${p.id}">${p.name}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Description</label>
+                    <textarea id="workflowDescription" rows="3" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none" placeholder="What makes this bundle special?">${template.description}</textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Price</label>
+                        <input type="text" id="workflowPrice" value="$${template.pricing.recommended}" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                        <p class="text-xs text-gray-500 mt-1">Range: $${template.pricing.min} - $${template.pricing.max}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Status</label>
+                        <select id="workflowStatus" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                            <option value="idea">💡 Idea</option>
+                            <option value="in_progress" selected>🚧 In Progress</option>
+                            <option value="ready">✅ Ready to Sell</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="bg-indigo-900/20 border border-indigo-500/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-indigo-400 mb-2">
+                        <i class="fas fa-lightbulb mr-2"></i>What happens next?
+                    </h4>
+                    <p class="text-xs text-gray-400">
+                        This will create a bundle container in your pipeline. You can then add individual products to it as you create them.
+                    </p>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-magic mr-2"></i>Create Bundle Template
+                    </button>
+                    <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function handleWorkflowTemplate(event, templateKey) {
+    event.preventDefault();
+    const template = workflowTemplates[templateKey];
+    
+    const aiToolSelect = document.getElementById('workflowAiTool');
+    const selectedOption = aiToolSelect.options[aiToolSelect.selectedIndex];
+    
+    // Create the bundle
+    const bundleData = {
+        name: document.getElementById('workflowName').value,
+        type: template.defaultType,
+        description: document.getElementById('workflowDescription').value,
+        price: document.getElementById('workflowPrice').value,
+        status: document.getElementById('workflowStatus').value,
+        productIds: [],
+        metadata: {
+            template: templateKey,
+            fields: {}
+        }
+    };
+    
+    // Collect template fields
+    Object.keys(template.fields).forEach(key => {
+        bundleData.metadata.fields[key] = document.getElementById(`workflow_${key}`).value;
+    });
+    
+    createBundle(bundleData);
+    
+    // Also create a placeholder product for the bundle
+    const productData = {
+        name: bundleData.name + ' (Bundle)',
+        type: template.defaultType,
+        status: bundleData.status,
+        aiTool: aiToolSelect.value,
+        aiToolId: selectedOption.dataset.id ? parseInt(selectedOption.dataset.id) : null,
+        description: bundleData.description,
+        price: bundleData.price,
+        notes: `Template: ${template.name}\\n${Object.entries(bundleData.metadata.fields).map(([k,v]) => `${template.fields[k].label}: ${v}`).join('\\n')}`
+    };
+    
+    addProduct(productData);
+    closeModal();
+    
+    if (currentView === 'products') {
+        renderProductPipeline();
+    }
+    
+    showNotification(`${template.emoji} Bundle template created!`);
+}
+
+// ==================== BUNDLE CREATOR MODAL ====================
+
+function showBundleCreatorModal() {
+    const availableProducts = products.filter(p => p.status === 'ready' || p.status === 'listed');
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-3xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-box-open mr-2 text-pink-400"></i>
+                    Create Product Bundle
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleCreateBundle(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Name *</label>
+                    <input type="text" id="bundleName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="e.g., Social Media Starter Pack">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-3">Select Products to Include</label>
+                    <div class="max-h-64 overflow-y-auto space-y-2 bg-darker border border-gray-700 rounded-lg p-4">
+                        ${availableProducts.length === 0 ? `
+                            <div class="text-center py-8 text-gray-500">
+                                <i class="fas fa-inbox text-3xl mb-2"></i>
+                                <p class="text-sm">No Ready or Listed products available</p>
+                                <p class="text-xs mt-2">Create and mark products as "Ready" first</p>
+                            </div>
+                        ` : availableProducts.map(product => `
+                            <label class="flex items-center gap-3 p-3 bg-dark border border-gray-700 rounded-lg hover:border-pink-500/50 cursor-pointer transition-all">
+                                <input type="checkbox" name="bundleProducts" value="${product.id}" class="w-4 h-4 text-pink-600 bg-gray-700 border-gray-600 rounded focus:ring-pink-500">
+                                <div class="flex-1">
+                                    <div class="text-white font-semibold">${product.name}</div>
+                                    <div class="text-xs text-gray-400">${product.type} ${product.price ? `• ${product.price}` : ''}</div>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Description</label>
+                    <textarea id="bundleDescription" rows="3" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="What's included in this bundle?"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Individual Price</label>
+                        <input type="text" id="bundleIndividualPrice" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="$49.99">
+                        <p class="text-xs text-gray-500 mt-1">Sum of individual prices</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Price *</label>
+                        <input type="text" id="bundlePrice" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="$29.99">
+                        <p class="text-xs text-gray-500 mt-1">Discounted price</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Discount %</label>
+                        <input type="text" id="bundleDiscount" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="40%">
+                        <p class="text-xs text-gray-500 mt-1">Calculated savings</p>
+                    </div>
+                </div>
+                
+                <div class="bg-pink-900/20 border border-pink-500/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-pink-400 mb-2">
+                        <i class="fas fa-calculator mr-2"></i>Pricing Tips
+                    </h4>
+                    <ul class="text-xs text-gray-400 space-y-1">
+                        <li>• Black Friday: 30-50% discount is standard</li>
+                        <li>• Bundle pricing increases perceived value</li>
+                        <li>• Clear discount % drives urgency</li>
+                    </ul>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-lg text-white font-semibold transition-all">
+                        <i class="fas fa-box-open mr-2"></i>Create Bundle
+                    </button>
+                    <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function handleCreateBundle(event) {
+    event.preventDefault();
+    
+    const selectedCheckboxes = document.querySelectorAll('input[name="bundleProducts"]:checked');
+    const productIds = Array.from(selectedCheckboxes).map(cb => parseInt(cb.value));
+    
+    if (productIds.length === 0) {
+        alert('Please select at least one product for the bundle');
+        return;
+    }
+    
+    const bundleData = {
+        name: document.getElementById('bundleName').value,
+        type: 'bundle',
+        productIds: productIds,
+        description: document.getElementById('bundleDescription').value,
+        individualPrice: document.getElementById('bundleIndividualPrice').value,
+        price: document.getElementById('bundlePrice').value,
+        discount: document.getElementById('bundleDiscount').value,
+        status: 'ready'
+    };
+    
+    createBundle(bundleData);
+    closeModal();
+    
+    if (currentView === 'products') {
+        renderProductPipeline();
+    }
+    
+    showNotification(`📦 Bundle created with ${productIds.length} products!`);
+}
+
+// ==================== EXPORT MODAL ====================
+
+function showExportModal() {
+    const readyProducts = getProductsByStatus('ready');
+    const listedProducts = getProductsByStatus('listed');
+    const allProducts = [...readyProducts, ...listedProducts];
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content max-w-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-download mr-2 text-cyan-400"></i>
+                    Export Products
+                </h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-cyan-400 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>Ready to Export
+                    </h4>
+                    <p class="text-sm text-gray-400">
+                        ${allProducts.length} products (Ready + Listed) available for export
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="exportToCSV()" class="p-6 bg-dark border-2 border-gray-700 hover:border-cyan-500 rounded-xl transition-all text-left">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-file-csv text-3xl text-green-400"></i>
+                            <div>
+                                <h3 class="font-bold text-white">CSV Export</h3>
+                                <p class="text-xs text-gray-400">Spreadsheet format</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500">
+                            Perfect for Gumroad, Etsy, and bulk uploads
+                        </p>
+                    </button>
+                    
+                    <button onclick="exportToJSON()" class="p-6 bg-dark border-2 border-gray-700 hover:border-cyan-500 rounded-xl transition-all text-left">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-code text-3xl text-blue-400"></i>
+                            <div>
+                                <h3 class="font-bold text-white">JSON Export</h3>
+                                <p class="text-xs text-gray-400">Developer format</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500">
+                            Use in APIs, websites, or custom integrations
+                        </p>
+                    </button>
+                    
+                    <button onclick="exportGumroadFormat()" class="p-6 bg-dark border-2 border-gray-700 hover:border-cyan-500 rounded-xl transition-all text-left">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-shopping-bag text-3xl text-pink-400"></i>
+                            <div>
+                                <h3 class="font-bold text-white">Gumroad Format</h3>
+                                <p class="text-xs text-gray-400">Direct import</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500">
+                            Pre-formatted for Gumroad product listings
+                        </p>
+                    </button>
+                    
+                    <button onclick="generateDescriptions()" class="p-6 bg-dark border-2 border-gray-700 hover:border-cyan-500 rounded-xl transition-all text-left">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-magic text-3xl text-purple-400"></i>
+                            <div>
+                                <h3 class="font-bold text-white">AI Descriptions</h3>
+                                <p class="text-xs text-gray-400">Coming soon</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500">
+                            Generate marketing copy with AI
+                        </p>
+                    </button>
+                </div>
+                
+                <div class="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-yellow-400 mb-2">
+                        <i class="fas fa-lightbulb mr-2"></i>Black Friday Tip
+                    </h4>
+                    <p class="text-xs text-gray-400">
+                        Export to CSV, add to spreadsheet, prepare bulk listings now. List everything on Black Friday eve for maximum impact!
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function exportToCSV() {
+    const readyProducts = getProductsByStatus('ready');
+    const listedProducts = getProductsByStatus('listed');
+    const allProducts = [...readyProducts, ...listedProducts];
+    
+    if (allProducts.length === 0) {
+        alert('No products ready for export. Move products to "Ready" or "Listed" status first.');
+        return;
+    }
+    
+    // CSV headers
+    const headers = ['Name', 'Type', 'Status', 'Description', 'Price', 'AI Tool', 'Notes', 'URL', 'Created Date'];
+    
+    // Convert products to CSV rows
+    const rows = allProducts.map(p => [
+        p.name,
+        p.type,
+        p.status,
+        p.description || '',
+        p.price || '',
+        p.aiTool || '',
+        p.notes || '',
+        p.url || '',
+        new Date(p.createdAt).toLocaleDateString()
+    ]);
+    
+    // Combine headers and rows
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\\n');
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `products_export_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    
+    closeModal();
+    showNotification(`📊 Exported ${allProducts.length} products to CSV!`);
+}
+
+function exportToJSON() {
+    const readyProducts = getProductsByStatus('ready');
+    const listedProducts = getProductsByStatus('listed');
+    const allProducts = [...readyProducts, ...listedProducts];
+    
+    if (allProducts.length === 0) {
+        alert('No products ready for export.');
+        return;
+    }
+    
+    const exportData = {
+        exported_at: new Date().toISOString(),
+        total_products: allProducts.length,
+        products: allProducts
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `products_export_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    
+    closeModal();
+    showNotification(`📦 Exported ${allProducts.length} products to JSON!`);
+}
+
+function exportGumroadFormat() {
+    const readyProducts = getProductsByStatus('ready');
+    const listedProducts = getProductsByStatus('listed');
+    const allProducts = [...readyProducts, ...listedProducts];
+    
+    if (allProducts.length === 0) {
+        alert('No products ready for export.');
+        return;
+    }
+    
+    // Gumroad CSV format
+    const headers = ['Name', 'Description', 'Price', 'URL Slug', 'Tags'];
+    
+    const rows = allProducts.map(p => [
+        p.name,
+        p.description || 'Premium digital product',
+        p.price?.replace('$', '') || '9.99',
+        p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        p.type
+    ]);
+    
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `gumroad_import_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    
+    closeModal();
+    showNotification(`🛍️ Exported ${allProducts.length} products for Gumroad!`);
+}
+
+function generateDescriptions() {
+    alert('AI Description Generator coming in next update! This will use your AI platforms to generate marketing copy automatically.');
+}
+
 // Make functions globally available
 window.showPlatformDetail = showPlatformDetail;
 window.launchPlatform = launchPlatform;
@@ -1355,6 +2057,16 @@ window.selectQuickType = selectQuickType;
 window.showProductDetail = showProductDetail;
 window.moveProduct = moveProduct;
 window.deleteProductConfirm = deleteProductConfirm;
+window.showWorkflowTemplatesModal = showWorkflowTemplatesModal;
+window.selectWorkflowTemplate = selectWorkflowTemplate;
+window.handleWorkflowTemplate = handleWorkflowTemplate;
+window.showBundleCreatorModal = showBundleCreatorModal;
+window.handleCreateBundle = handleCreateBundle;
+window.showExportModal = showExportModal;
+window.exportToCSV = exportToCSV;
+window.exportToJSON = exportToJSON;
+window.exportGumroadFormat = exportGumroadFormat;
+window.generateDescriptions = generateDescriptions;
 window.editProduct = function(productId) {
     alert('Edit functionality coming in next update!');
 };
