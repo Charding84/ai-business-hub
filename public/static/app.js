@@ -509,7 +509,7 @@ function renderStats(stats) {
     const statsHTML = `
         <div class="stat-card rounded-xl p-6 card-hover cursor-pointer">
             <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-server text-3xl text-purple-400"></i>
+                <i class="fas fa-server text-3xl text-[#00ffd5]"></i>
                 <span class="text-3xl font-bold text-white">${stats.totalPlatforms}</span>
             </div>
             <p class="text-gray-400 text-sm font-semibold">Total Platforms</p>
@@ -517,7 +517,7 @@ function renderStats(stats) {
         
         <div class="stat-card rounded-xl p-6 card-hover cursor-pointer">
             <div class="flex items-center justify-between mb-2">
-                <i class="fas fa-brain text-3xl text-pink-400"></i>
+                <i class="fas fa-brain text-3xl text-[#00e5ff]"></i>
                 <span class="text-3xl font-bold text-white">${stats.totalModels}</span>
             </div>
             <p class="text-gray-400 text-sm font-semibold">AI Models</p>
@@ -546,19 +546,19 @@ function renderStats(stats) {
 // Render filter tabs
 function renderFilterTabs(categories) {
     const allTabHTML = `
-        <button class="filter-tab active px-6 py-3 rounded-xl bg-purple-600 text-white font-semibold transition-all" data-category="all">
+        <button class="filter-tab active px-6 py-3 rounded-xl bg-[#14b8a6] text-white font-semibold transition-all" data-category="all">
             <i class="fas fa-th mr-2"></i>All Platforms
         </button>
     `;
     
     const favoritesTabHTML = `
-        <button class="filter-tab px-6 py-3 rounded-xl bg-dark border border-purple-500/30 text-gray-300 hover:bg-purple-600/20 hover:text-white font-semibold transition-all" data-category="favorites">
+        <button class="filter-tab px-6 py-3 rounded-xl bg-dark border border-[#00ffd5]/30 text-gray-300 hover:bg-[#14b8a6]/20 hover:text-white font-semibold transition-all" data-category="favorites">
             <i class="fas fa-heart mr-2"></i>Favorites <span class="ml-2 text-xs opacity-75">(${favorites.length})</span>
         </button>
     `;
     
     const categoryTabsHTML = categories.map(cat => `
-        <button class="filter-tab px-6 py-3 rounded-xl bg-dark border border-purple-500/30 text-gray-300 hover:bg-purple-600/20 hover:text-white font-semibold transition-all" data-category="${cat.name}">
+        <button class="filter-tab px-6 py-3 rounded-xl bg-dark border border-[#00ffd5]/30 text-gray-300 hover:bg-[#14b8a6]/20 hover:text-white font-semibold transition-all" data-category="${cat.name}">
             <i class="${getCategoryIcon(cat.name)} mr-2"></i>${cat.name} <span class="ml-2 text-xs opacity-75">(${cat.count})</span>
         </button>
     `).join('');
@@ -569,11 +569,11 @@ function renderFilterTabs(categories) {
     document.querySelectorAll('.filter-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.filter-tab').forEach(t => {
-                t.classList.remove('active', 'bg-purple-600', 'text-white');
-                t.classList.add('bg-dark', 'border', 'border-purple-500/30', 'text-gray-300');
+                t.classList.remove('active', 'bg-[#14b8a6]', 'text-white');
+                t.classList.add('bg-dark', 'border', 'border-[#00ffd5]/30', 'text-gray-300');
             });
-            tab.classList.add('active', 'bg-purple-600', 'text-white');
-            tab.classList.remove('bg-dark', 'border', 'border-purple-500/30', 'text-gray-300');
+            tab.classList.add('active', 'bg-[#14b8a6]', 'text-white');
+            tab.classList.remove('bg-dark', 'border', 'border-[#00ffd5]/30', 'text-gray-300');
             
             currentFilter = tab.dataset.category;
             if (currentFilter === 'favorites') {
@@ -665,18 +665,18 @@ function renderPlatforms(platforms) {
                         ${platform.models.slice(0, 3).map(model => `
                             <p class="text-sm text-gray-400 line-clamp-1">• ${model}</p>
                         `).join('')}
-                        ${platform.models.length > 3 ? `<p class="text-xs text-purple-400">+${platform.models.length - 3} more</p>` : ''}
+                        ${platform.models.length > 3 ? `<p class="text-xs text-[#00ffd5]">+${platform.models.length - 3} more</p>` : ''}
                     </div>
                 </div>
             ` : ''}
             
-            <div class="flex gap-2 pt-4 border-t border-purple-500/20">
+            <div class="flex gap-2 pt-4 border-t border-[#00ffd5]/20">
                 ${platform.url ? `
-                    <button onclick="event.stopPropagation(); launchPlatform('${platform.url}', ${platform.id})" class="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white text-sm font-semibold transition-all">
+                    <button onclick="event.stopPropagation(); launchPlatform('${platform.url}', ${platform.id})" class="flex-1 px-4 py-2 bg-gradient-to-r from-[#00ffd5] to-[#00e5ff] hover:from-[#00e5ff] hover:to-[#14b8a6] rounded-lg text-white text-sm font-semibold transition-all">
                         <i class="fas fa-rocket mr-2"></i>Launch
                     </button>
                 ` : ''}
-                <button onclick="showPlatformDetail(${platform.id})" class="flex-1 px-4 py-2 bg-dark border border-purple-500/30 hover:bg-purple-600/20 rounded-lg text-purple-400 text-sm font-semibold transition-all">
+                <button onclick="showPlatformDetail(${platform.id})" class="flex-1 px-4 py-2 bg-dark border border-[#00ffd5]/30 hover:bg-[#14b8a6]/20 rounded-lg text-[#00ffd5] text-sm font-semibold transition-all">
                     <i class="fas fa-info-circle mr-2"></i>Details
                 </button>
             </div>
@@ -718,12 +718,12 @@ function showPlatformDetail(platformId) {
         contentHTML += `
             <div class="mb-6">
                 <h3 class="text-xl font-bold text-white mb-4 flex items-center">
-                    <i class="fas fa-brain text-purple-400 mr-2"></i>
+                    <i class="fas fa-brain text-[#00ffd5] mr-2"></i>
                     AI Models (${platform.models.length})
                 </h3>
                 <div class="grid gap-2">
                     ${platform.models.map(model => `
-                        <div class="bg-darker border border-purple-500/20 rounded-lg p-3">
+                        <div class="bg-darker border border-[#00ffd5]/20 rounded-lg p-3">
                             <p class="text-gray-300">${model}</p>
                         </div>
                     `).join('')}
@@ -737,7 +737,7 @@ function showPlatformDetail(platformId) {
         contentHTML += `
             <div class="mb-6">
                 <h3 class="text-xl font-bold text-white mb-4 flex items-center">
-                    <i class="fas fa-list text-pink-400 mr-2"></i>
+                    <i class="fas fa-list text-[#00e5ff] mr-2"></i>
                     Features & Details (${platform.details.length})
                 </h3>
                 <div class="space-y-2 max-h-96 overflow-y-auto scrollbar-custom">
@@ -754,14 +754,14 @@ function showPlatformDetail(platformId) {
     
     // Quick links
     contentHTML += `
-        <div class="bg-darker border border-purple-500/20 rounded-lg p-4">
+        <div class="bg-darker border border-[#00ffd5]/20 rounded-lg p-4">
             <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
                 <i class="fas fa-external-link-alt text-blue-400 mr-2"></i>
                 Quick Actions
             </h4>
             <div class="flex flex-wrap gap-2">
                 ${platform.url ? `
-                    <button onclick="launchPlatform('${platform.url}', ${platform.id})" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white text-sm font-semibold transition-all">
+                    <button onclick="launchPlatform('${platform.url}', ${platform.id})" class="px-4 py-2 bg-gradient-to-r from-[#00ffd5] to-[#00e5ff] hover:from-[#00e5ff] hover:to-[#14b8a6] rounded-lg text-white text-sm font-semibold transition-all">
                         <i class="fas fa-rocket mr-2"></i>Launch Platform
                     </button>
                 ` : ''}
@@ -848,7 +848,7 @@ function renderQuickLaunchBar() {
         // Create quick launch bar
         const bar = document.createElement('div');
         bar.id = 'quickLaunchBar';
-        bar.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-dark/90 backdrop-blur-lg border border-purple-500/30 rounded-2xl p-3 shadow-2xl z-50 flex gap-2';
+        bar.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-dark/90 backdrop-blur-lg border border-[#00ffd5]/30 rounded-2xl p-3 shadow-2xl z-50 flex gap-2';
         bar.innerHTML = '<div class="flex gap-2" id="quickLaunchButtons"></div>';
         document.body.appendChild(bar);
     }
@@ -867,7 +867,7 @@ function updateQuickLaunchBar() {
         .slice(0, 6)
         .map(platform => `
             <button onclick="launchPlatform('${platform.url}', ${platform.id})" 
-                    class="group relative px-4 py-3 bg-gradient-to-br from-purple-600/20 to-pink-600/20 hover:from-purple-600 hover:to-pink-600 rounded-xl transition-all hover:scale-110 border border-purple-500/30"
+                    class="group relative px-4 py-3 bg-gradient-to-br from-[#14b8a6]/20 to-[#00e5ff]/20 hover:from-[#14b8a6] hover:to-[#00e5ff] rounded-xl transition-all hover:scale-110 border border-[#00ffd5]/30"
                     title="${platform.name}">
                 <i class="${getCategoryIcon(platform.category)} text-white text-lg"></i>
                 <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-dark/90 px-2 py-1 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -893,7 +893,7 @@ function setupSmartAssistant() {
     
     const smartBtn = document.createElement('button');
     smartBtn.id = 'smartAssistantBtn';
-    smartBtn.className = 'px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white font-semibold transition-all';
+    smartBtn.className = 'px-4 py-2 bg-gradient-to-r from-[#00ffd5] to-[#00e5ff] hover:from-[#00e5ff] hover:to-[#14b8a6] rounded-lg text-white font-semibold transition-all';
     smartBtn.innerHTML = '<i class="fas fa-magic mr-2"></i>Ask AI CSO';
     smartBtn.onclick = showSmartAssistant;
     
@@ -908,13 +908,13 @@ function showSmartAssistant() {
     const content = document.getElementById('modalContent');
     
     title.textContent = '🧠 AI Business CSO - Smart Platform Assistant';
-    badges.innerHTML = '<span class="badge bg-gradient-to-r from-purple-600 to-pink-600 text-white"><i class="fas fa-robot mr-1"></i>Powered by AI</span>';
+    badges.innerHTML = '<span class="badge bg-gradient-to-r from-[#14b8a6] to-[#00e5ff] text-white"><i class="fas fa-robot mr-1"></i>Powered by AI</span>';
     
     content.innerHTML = `
         <div class="space-y-6">
-            <div class="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/30 rounded-xl p-6">
+            <div class="bg-gradient-to-br from-[#0a0a0a]/20 to-[#0a0a0a]/20 border border-[#00ffd5]/30 rounded-xl p-6">
                 <h3 class="text-xl font-bold text-white mb-3 flex items-center">
-                    <i class="fas fa-question-circle text-purple-400 mr-2"></i>
+                    <i class="fas fa-question-circle text-[#00ffd5] mr-2"></i>
                     What do you need to do?
                 </h3>
                 <p class="text-gray-400 mb-4">Tell me your task and I'll recommend the best AI platform</p>
@@ -924,9 +924,9 @@ function showSmartAssistant() {
                         type="text" 
                         id="assistantInput" 
                         placeholder="e.g., I need to code a website, create a logo, write an email..." 
-                        class="w-full px-6 py-4 bg-darker border border-purple-500/30 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 text-white placeholder-gray-500"
+                        class="w-full px-6 py-4 bg-darker border border-[#00ffd5]/30 rounded-xl focus:outline-none focus:border-[#00ffd5] focus:ring-2 focus:ring-[#00ffd5]/20 text-white placeholder-gray-500"
                     />
-                    <button onclick="getRecommendation()" class="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white font-semibold transition-all">
+                    <button onclick="getRecommendation()" class="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-gradient-to-r from-[#00ffd5] to-[#00e5ff] hover:from-[#00e5ff] hover:to-[#14b8a6] rounded-lg text-white font-semibold transition-all">
                         <i class="fas fa-paper-plane mr-2"></i>Ask
                     </button>
                 </div>
@@ -935,7 +935,7 @@ function showSmartAssistant() {
             <div id="recommendationResults"></div>
             
             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-darker border border-purple-500/20 rounded-xl p-4">
+                <div class="bg-darker border border-[#00ffd5]/20 rounded-xl p-4">
                     <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
                         <i class="fas fa-clock text-blue-400 mr-2"></i>
                         Recent Activity
@@ -945,7 +945,7 @@ function showSmartAssistant() {
                             const platform = allPlatforms.find(p => p.id === activity.platformId);
                             if (!platform) return '';
                             return `
-                                <button onclick="launchPlatform('${activity.url}', ${activity.platformId})" class="w-full text-left px-3 py-2 bg-purple-600/10 hover:bg-purple-600/20 rounded-lg transition-all">
+                                <button onclick="launchPlatform('${activity.url}', ${activity.platformId})" class="w-full text-left px-3 py-2 bg-[#14b8a6]/10 hover:bg-[#14b8a6]/20 rounded-lg transition-all">
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-300">${platform.name.split(/[($]/)[0].trim()}</span>
                                         <span class="text-xs text-gray-500">${getTimeAgo(activity.timestamp)}</span>
@@ -956,7 +956,7 @@ function showSmartAssistant() {
                     </div>
                 </div>
                 
-                <div class="bg-darker border border-purple-500/20 rounded-xl p-4">
+                <div class="bg-darker border border-[#00ffd5]/20 rounded-xl p-4">
                     <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
                         <i class="fas fa-dollar-sign text-green-400 mr-2"></i>
                         Cost Overview
@@ -978,22 +978,22 @@ function showSmartAssistant() {
                 </div>
             </div>
             
-            <div class="bg-darker border border-purple-500/20 rounded-xl p-4">
+            <div class="bg-darker border border-[#00ffd5]/20 rounded-xl p-4">
                 <h4 class="text-lg font-semibold text-white mb-3 flex items-center">
                     <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>
                     Quick Examples
                 </h4>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="document.getElementById('assistantInput').value='I need to write code'; getRecommendation()" class="px-4 py-2 bg-purple-600/20 hover:bg-purple-600 rounded-lg text-sm text-gray-300 hover:text-white transition-all">
+                    <button onclick="document.getElementById('assistantInput').value='I need to write code'; getRecommendation()" class="px-4 py-2 bg-[#14b8a6]/20 hover:bg-[#14b8a6] rounded-lg text-sm text-gray-300 hover:text-white transition-all">
                         Write code
                     </button>
-                    <button onclick="document.getElementById('assistantInput').value='I need to create images'; getRecommendation()" class="px-4 py-2 bg-purple-600/20 hover:bg-purple-600 rounded-lg text-sm text-gray-300 hover:text-white transition-all">
+                    <button onclick="document.getElementById('assistantInput').value='I need to create images'; getRecommendation()" class="px-4 py-2 bg-[#14b8a6]/20 hover:bg-[#14b8a6] rounded-lg text-sm text-gray-300 hover:text-white transition-all">
                         Create images
                     </button>
-                    <button onclick="document.getElementById('assistantInput').value='I need to do research'; getRecommendation()" class="px-4 py-2 bg-purple-600/20 hover:bg-purple-600 rounded-lg text-sm text-gray-300 hover:text-white transition-all">
+                    <button onclick="document.getElementById('assistantInput').value='I need to do research'; getRecommendation()" class="px-4 py-2 bg-[#14b8a6]/20 hover:bg-[#14b8a6] rounded-lg text-sm text-gray-300 hover:text-white transition-all">
                         Do research
                     </button>
-                    <button onclick="document.getElementById('assistantInput').value='I need to design a presentation'; getRecommendation()" class="px-4 py-2 bg-purple-600/20 hover:bg-purple-600 rounded-lg text-sm text-gray-300 hover:text-white transition-all">
+                    <button onclick="document.getElementById('assistantInput').value='I need to design a presentation'; getRecommendation()" class="px-4 py-2 bg-[#14b8a6]/20 hover:bg-[#14b8a6] rounded-lg text-sm text-gray-300 hover:text-white transition-all">
                         Make presentation
                     </button>
                 </div>
@@ -1029,7 +1029,7 @@ async function getRecommendation() {
     }
     
     const resultsDiv = document.getElementById('recommendationResults');
-    resultsDiv.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-purple-400"></i><p class="text-gray-400 mt-4">Analyzing your task...</p></div>';
+    resultsDiv.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-4xl text-[#00ffd5]"></i><p class="text-gray-400 mt-4">Analyzing your task...</p></div>';
     
     try {
         const response = await axios.get(`/api/recommend?task=${encodeURIComponent(task)}`);
@@ -1037,7 +1037,7 @@ async function getRecommendation() {
         
         if (recommendations.length === 0) {
             resultsDiv.innerHTML = `
-                <div class="bg-darker border border-purple-500/20 rounded-xl p-6 text-center">
+                <div class="bg-darker border border-[#00ffd5]/20 rounded-xl p-6 text-center">
                     <i class="fas fa-search text-4xl text-gray-500 mb-4"></i>
                     <p class="text-gray-400">No specific recommendations found. Try being more specific!</p>
                 </div>
@@ -1046,24 +1046,24 @@ async function getRecommendation() {
         }
         
         resultsDiv.innerHTML = `
-            <div class="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/30 rounded-xl p-6">
+            <div class="bg-gradient-to-br from-[#0a0a0a]/20 to-[#0a0a0a]/20 border border-[#00ffd5]/30 rounded-xl p-6">
                 <h3 class="text-xl font-bold text-white mb-4 flex items-center">
                     <i class="fas fa-check-circle text-green-400 mr-2"></i>
                     Recommended Platforms for: "${task}"
                 </h3>
                 <div class="space-y-3">
                     ${recommendations.map((rec, index) => `
-                        <div class="bg-darker border border-purple-500/20 rounded-lg p-4 hover:border-purple-500/50 transition-all">
+                        <div class="bg-darker border border-[#00ffd5]/20 rounded-lg p-4 hover:border-[#00ffd5]/50 transition-all">
                             <div class="flex items-start justify-between mb-2">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <span class="text-2xl font-bold text-purple-400">#${index + 1}</span>
+                                        <span class="text-2xl font-bold text-[#00ffd5]">#${index + 1}</span>
                                         <h4 class="text-lg font-semibold text-white">${rec.platform.name.split(/[($]/)[0].trim()}</h4>
-                                        <span class="badge bg-purple-600 text-white text-xs">Score: ${rec.relevanceScore}</span>
+                                        <span class="badge bg-[#14b8a6] text-white text-xs">Score: ${rec.relevanceScore}</span>
                                     </div>
                                     <div class="flex flex-wrap gap-2 mb-2">
                                         ${rec.platform.bestFor?.slice(0, 3).map(skill => `
-                                            <span class="badge bg-purple-600/20 text-purple-300 text-xs">${skill}</span>
+                                            <span class="badge bg-[#14b8a6]/20 text-[#00ffd5] text-xs">${skill}</span>
                                         `).join('') || ''}
                                     </div>
                                     <p class="text-sm text-gray-400 mb-2">${rec.platform.description || ''}</p>
@@ -1075,11 +1075,11 @@ async function getRecommendation() {
                             </div>
                             <div class="flex gap-2 mt-3">
                                 ${rec.platform.url ? `
-                                    <button onclick="launchPlatform('${rec.platform.url}', ${rec.platform.id}); closeModal();" class="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white text-sm font-semibold transition-all">
+                                    <button onclick="launchPlatform('${rec.platform.url}', ${rec.platform.id}); closeModal();" class="flex-1 px-4 py-2 bg-gradient-to-r from-[#00ffd5] to-[#00e5ff] hover:from-[#00e5ff] hover:to-[#14b8a6] rounded-lg text-white text-sm font-semibold transition-all">
                                         <i class="fas fa-rocket mr-2"></i>Launch Now
                                     </button>
                                 ` : ''}
-                                <button onclick="showPlatformDetail(${rec.platform.id})" class="px-4 py-2 bg-dark border border-purple-500/30 hover:bg-purple-600/20 rounded-lg text-purple-400 text-sm font-semibold transition-all">
+                                <button onclick="showPlatformDetail(${rec.platform.id})" class="px-4 py-2 bg-dark border border-[#00ffd5]/30 hover:bg-[#14b8a6]/20 rounded-lg text-[#00ffd5] text-sm font-semibold transition-all">
                                     <i class="fas fa-info-circle mr-2"></i>Details
                                 </button>
                             </div>
@@ -1130,7 +1130,7 @@ function toggleView() {
     
     if (currentView === 'products') {
         button.innerHTML = '<i class="fas fa-rocket mr-2"></i>AI Platforms';
-        button.className = 'px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+        button.className = 'px-6 py-2 bg-gradient-to-r from-[#00ffd5] to-[#00e5ff] hover:from-[#00e5ff] hover:to-[#14b8a6] rounded-lg text-white font-semibold transition-all shadow-lg';
         renderProductPipeline();
     } else {
         button.innerHTML = '<i class="fas fa-briefcase mr-2"></i>Product Pipeline';
@@ -1161,7 +1161,7 @@ function renderProductPipeline() {
                     <p class="text-gray-400">Track your digital products from idea to sale</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="showWorkflowTemplatesModal()" class="px-4 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                    <button onclick="showWorkflowTemplatesModal()" class="px-4 py-3 bg-gradient-to-r from-[#14b8a6] to-blue-600 hover:from-[#0d9488] hover:to-blue-700 rounded-lg text-white font-semibold transition-all shadow-lg">
                         <i class="fas fa-magic mr-2"></i>Templates
                     </button>
                     <button onclick="showQuickCaptureModal()" class="px-4 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 rounded-lg text-white font-semibold transition-all shadow-lg">
@@ -1170,7 +1170,7 @@ function renderProductPipeline() {
                     <button onclick="showAddProductModal()" class="px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg text-white font-semibold transition-all shadow-lg">
                         <i class="fas fa-plus mr-2"></i>Product
                     </button>
-                    <button onclick="showBundleCreatorModal()" class="px-4 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-lg text-white font-semibold transition-all shadow-lg">
+                    <button onclick="showBundleCreatorModal()" class="px-4 py-3 bg-gradient-to-r from-[#00e5ff] to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-lg text-white font-semibold transition-all shadow-lg">
                         <i class="fas fa-box-open mr-2"></i>Bundle
                     </button>
                     <button onclick="showExportModal()" class="px-4 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all shadow-lg">
@@ -1193,12 +1193,12 @@ function renderProductPipeline() {
                     <div class="text-3xl font-bold text-green-400">${readyCount}</div>
                     <div class="text-sm text-gray-400 mt-1">Ready to Sell</div>
                 </div>
-                <div class="bg-dark border border-purple-500/30 rounded-xl p-4">
-                    <div class="text-3xl font-bold text-purple-400">${listedCount}</div>
+                <div class="bg-dark border border-[#00ffd5]/30 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-[#00ffd5]">${listedCount}</div>
                     <div class="text-sm text-gray-400 mt-1">Listed</div>
                 </div>
-                <div class="bg-dark border border-pink-500/30 rounded-xl p-4">
-                    <div class="text-3xl font-bold text-pink-400">${totalCount}</div>
+                <div class="bg-dark border border-[#00e5ff]/30 rounded-xl p-4">
+                    <div class="text-3xl font-bold text-[#00e5ff]">${totalCount}</div>
                     <div class="text-sm text-gray-400 mt-1">Total Products</div>
                 </div>
             </div>
@@ -1561,10 +1561,10 @@ function showProductDetail(productId) {
                     <div>
                         <h3 class="text-sm font-semibold text-gray-400 mb-2">AI Tool Used</h3>
                         <div class="flex items-center gap-2">
-                            <i class="fas fa-robot text-purple-400"></i>
+                            <i class="fas fa-robot text-[#00ffd5]"></i>
                             <span class="text-white">${product.aiTool}</span>
                             ${product.aiToolId ? `
-                                <button onclick="launchPlatform('${allPlatforms.find(p => p.id === product.aiToolId)?.url}', ${product.aiToolId})" class="px-3 py-1 bg-purple-600/20 hover:bg-purple-600/40 rounded text-purple-400 text-xs font-semibold transition-all">
+                                <button onclick="launchPlatform('${allPlatforms.find(p => p.id === product.aiToolId)?.url}', ${product.aiToolId})" class="px-3 py-1 bg-[#14b8a6]/20 hover:bg-[#14b8a6]/40 rounded text-[#00ffd5] text-xs font-semibold transition-all">
                                     <i class="fas fa-external-link-alt mr-1"></i>Launch
                                 </button>
                             ` : ''}
@@ -1640,7 +1640,7 @@ function showWorkflowTemplatesModal() {
         <div class="modal-content max-w-4xl">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-white">
-                    <i class="fas fa-magic mr-2 text-indigo-400"></i>
+                    <i class="fas fa-magic mr-2 text-[#00ffd5]"></i>
                     Workflow Templates
                 </h2>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
@@ -1652,12 +1652,12 @@ function showWorkflowTemplatesModal() {
             
             <div class="grid grid-cols-2 gap-4">
                 ${Object.entries(workflowTemplates).map(([key, template]) => `
-                    <div class="bg-dark border border-indigo-500/30 rounded-xl p-4 hover:border-indigo-500 transition-all cursor-pointer" onclick="selectWorkflowTemplate('${key}')">
+                    <div class="bg-dark border border-[#00ffd5]/30 rounded-xl p-4 hover:border-[#00ffd5] transition-all cursor-pointer" onclick="selectWorkflowTemplate('${key}')">
                         <div class="flex items-center justify-between mb-3">
                             <h3 class="text-xl font-bold text-white">
                                 ${template.emoji} ${template.name}
                             </h3>
-                            <span class="badge bg-indigo-600 text-white text-xs">$${template.pricing.recommended}</span>
+                            <span class="badge bg-[#14b8a6] text-white text-xs">$${template.pricing.recommended}</span>
                         </div>
                         <p class="text-sm text-gray-400 mb-3">${template.description}</p>
                         <div class="flex items-center gap-2 text-xs text-gray-500">
@@ -1698,19 +1698,19 @@ function showWorkflowFormModal(templateKey) {
             <form onsubmit="handleWorkflowTemplate(event, '${templateKey}')" class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Name *</label>
-                    <input type="text" id="workflowName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none" placeholder="e.g., Ultimate ${template.name}">
+                    <input type="text" id="workflowName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00ffd5] focus:outline-none" placeholder="e.g., Ultimate ${template.name}">
                 </div>
                 
                 ${Object.entries(template.fields).map(([key, field]) => `
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">${field.label}</label>
-                        <input type="text" id="workflow_${key}" value="${field.default}" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                        <input type="text" id="workflow_${key}" value="${field.default}" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00ffd5] focus:outline-none">
                     </div>
                 `).join('')}
                 
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">AI Tool to Use *</label>
-                    <select id="workflowAiTool" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                    <select id="workflowAiTool" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00ffd5] focus:outline-none">
                         <option value="">Select AI tool...</option>
                         ${template.suggestedAIs.map(id => {
                             const platform = allPlatforms.find(p => p.id === id);
@@ -1723,18 +1723,18 @@ function showWorkflowFormModal(templateKey) {
                 
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Description</label>
-                    <textarea id="workflowDescription" rows="3" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none" placeholder="What makes this bundle special?">${template.description}</textarea>
+                    <textarea id="workflowDescription" rows="3" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00ffd5] focus:outline-none" placeholder="What makes this bundle special?">${template.description}</textarea>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Price</label>
-                        <input type="text" id="workflowPrice" value="$${template.pricing.recommended}" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                        <input type="text" id="workflowPrice" value="$${template.pricing.recommended}" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00ffd5] focus:outline-none">
                         <p class="text-xs text-gray-500 mt-1">Range: $${template.pricing.min} - $${template.pricing.max}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Status</label>
-                        <select id="workflowStatus" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-indigo-500 focus:outline-none">
+                        <select id="workflowStatus" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00ffd5] focus:outline-none">
                             <option value="idea">💡 Idea</option>
                             <option value="in_progress" selected>🚧 In Progress</option>
                             <option value="ready">✅ Ready to Sell</option>
@@ -1742,8 +1742,8 @@ function showWorkflowFormModal(templateKey) {
                     </div>
                 </div>
                 
-                <div class="bg-indigo-900/20 border border-indigo-500/30 rounded-lg p-4">
-                    <h4 class="text-sm font-semibold text-indigo-400 mb-2">
+                <div class="bg-[#0a0a0a]/20 border border-[#00ffd5]/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-[#00ffd5] mb-2">
                         <i class="fas fa-lightbulb mr-2"></i>What happens next?
                     </h4>
                     <p class="text-xs text-gray-400">
@@ -1752,7 +1752,7 @@ function showWorkflowFormModal(templateKey) {
                 </div>
                 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-lg text-white font-semibold transition-all">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-[#14b8a6] to-blue-600 hover:from-[#0d9488] hover:to-blue-700 rounded-lg text-white font-semibold transition-all">
                         <i class="fas fa-magic mr-2"></i>Create Bundle Template
                     </button>
                     <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
@@ -1826,7 +1826,7 @@ function showBundleCreatorModal() {
         <div class="modal-content max-w-3xl">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-white">
-                    <i class="fas fa-box-open mr-2 text-pink-400"></i>
+                    <i class="fas fa-box-open mr-2 text-[#00e5ff]"></i>
                     Create Product Bundle
                 </h2>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
@@ -1837,7 +1837,7 @@ function showBundleCreatorModal() {
             <form onsubmit="handleCreateBundle(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Name *</label>
-                    <input type="text" id="bundleName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="e.g., Social Media Starter Pack">
+                    <input type="text" id="bundleName" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00e5ff] focus:outline-none" placeholder="e.g., Social Media Starter Pack">
                 </div>
                 
                 <div>
@@ -1850,8 +1850,8 @@ function showBundleCreatorModal() {
                                 <p class="text-xs mt-2">Create and mark products as "Ready" first</p>
                             </div>
                         ` : availableProducts.map(product => `
-                            <label class="flex items-center gap-3 p-3 bg-dark border border-gray-700 rounded-lg hover:border-pink-500/50 cursor-pointer transition-all">
-                                <input type="checkbox" name="bundleProducts" value="${product.id}" class="w-4 h-4 text-pink-600 bg-gray-700 border-gray-600 rounded focus:ring-pink-500">
+                            <label class="flex items-center gap-3 p-3 bg-dark border border-gray-700 rounded-lg hover:border-[#00e5ff]/50 cursor-pointer transition-all">
+                                <input type="checkbox" name="bundleProducts" value="${product.id}" class="w-4 h-4 text-[#00e5ff] bg-gray-700 border-gray-600 rounded focus:ring-[#00e5ff]">
                                 <div class="flex-1">
                                     <div class="text-white font-semibold">${product.name}</div>
                                     <div class="text-xs text-gray-400">${product.type} ${product.price ? `• ${product.price}` : ''}</div>
@@ -1863,29 +1863,29 @@ function showBundleCreatorModal() {
                 
                 <div>
                     <label class="block text-sm font-semibold text-gray-300 mb-2">Description</label>
-                    <textarea id="bundleDescription" rows="3" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="What's included in this bundle?"></textarea>
+                    <textarea id="bundleDescription" rows="3" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00e5ff] focus:outline-none" placeholder="What's included in this bundle?"></textarea>
                 </div>
                 
                 <div class="grid grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Individual Price</label>
-                        <input type="text" id="bundleIndividualPrice" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="$49.99">
+                        <input type="text" id="bundleIndividualPrice" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00e5ff] focus:outline-none" placeholder="$49.99">
                         <p class="text-xs text-gray-500 mt-1">Sum of individual prices</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Bundle Price *</label>
-                        <input type="text" id="bundlePrice" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="$29.99">
+                        <input type="text" id="bundlePrice" required class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00e5ff] focus:outline-none" placeholder="$29.99">
                         <p class="text-xs text-gray-500 mt-1">Discounted price</p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-300 mb-2">Discount %</label>
-                        <input type="text" id="bundleDiscount" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-pink-500 focus:outline-none" placeholder="40%">
+                        <input type="text" id="bundleDiscount" class="w-full px-4 py-2 bg-darker border border-gray-700 rounded-lg text-white focus:border-[#00e5ff] focus:outline-none" placeholder="40%">
                         <p class="text-xs text-gray-500 mt-1">Calculated savings</p>
                     </div>
                 </div>
                 
-                <div class="bg-pink-900/20 border border-pink-500/30 rounded-lg p-4">
-                    <h4 class="text-sm font-semibold text-pink-400 mb-2">
+                <div class="bg-[#0a0a0a]/20 border border-[#00e5ff]/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-[#00e5ff] mb-2">
                         <i class="fas fa-calculator mr-2"></i>Pricing Tips
                     </h4>
                     <ul class="text-xs text-gray-400 space-y-1">
@@ -1896,7 +1896,7 @@ function showBundleCreatorModal() {
                 </div>
                 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-lg text-white font-semibold transition-all">
+                    <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-[#00e5ff] to-rose-600 hover:from-pink-700 hover:to-rose-700 rounded-lg text-white font-semibold transition-all">
                         <i class="fas fa-box-open mr-2"></i>Create Bundle
                     </button>
                     <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold transition-all">
@@ -2001,7 +2001,7 @@ function showExportModal() {
                     
                     <button onclick="exportGumroadFormat()" class="p-6 bg-dark border-2 border-gray-700 hover:border-cyan-500 rounded-xl transition-all text-left">
                         <div class="flex items-center gap-3 mb-3">
-                            <i class="fas fa-shopping-bag text-3xl text-pink-400"></i>
+                            <i class="fas fa-shopping-bag text-3xl text-[#00e5ff]"></i>
                             <div>
                                 <h3 class="font-bold text-white">Gumroad Format</h3>
                                 <p class="text-xs text-gray-400">Direct import</p>
@@ -2014,7 +2014,7 @@ function showExportModal() {
                     
                     <button onclick="generateDescriptions()" class="p-6 bg-dark border-2 border-gray-700 hover:border-cyan-500 rounded-xl transition-all text-left">
                         <div class="flex items-center gap-3 mb-3">
-                            <i class="fas fa-magic text-3xl text-purple-400"></i>
+                            <i class="fas fa-magic text-3xl text-[#00ffd5]"></i>
                             <div>
                                 <h3 class="font-bold text-white">AI Descriptions</h3>
                                 <p class="text-xs text-gray-400">Coming soon</p>
@@ -2193,7 +2193,7 @@ function switchView(view) {
     } else if (view === 'products') {
         if (pipelineBtn) {
             pipelineBtn.innerHTML = '<i class="fas fa-rocket mr-2"></i>AI Platforms';
-            pipelineBtn.className = 'px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white font-semibold transition-all shadow-lg';
+            pipelineBtn.className = 'px-6 py-2 bg-gradient-to-r from-[#00ffd5] to-[#00e5ff] hover:from-[#00e5ff] hover:to-[#14b8a6] rounded-lg text-white font-semibold transition-all shadow-lg';
         }
         if (captureBtn) {
             captureBtn.className = 'px-6 py-2 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 rounded-lg text-white font-semibold transition-all shadow-lg';
@@ -2269,12 +2269,12 @@ function renderCaptureLibrary() {
                     <div class="text-2xl font-bold text-cyan-400">${captures.length}</div>
                     <div class="text-xs text-gray-400 mt-1">All</div>
                 </div>
-                <div class="bg-dark border border-purple-500/30 rounded-xl p-3 cursor-pointer hover:border-purple-500 transition-all" onclick="filterCapturesByType('text')">
-                    <div class="text-2xl font-bold text-purple-400">${textCaptures.length}</div>
+                <div class="bg-dark border border-[#00ffd5]/30 rounded-xl p-3 cursor-pointer hover:border-[#00ffd5] transition-all" onclick="filterCapturesByType('text')">
+                    <div class="text-2xl font-bold text-[#00ffd5]">${textCaptures.length}</div>
                     <div class="text-xs text-gray-400 mt-1">💬 Text</div>
                 </div>
-                <div class="bg-dark border border-pink-500/30 rounded-xl p-3 cursor-pointer hover:border-pink-500 transition-all" onclick="filterCapturesByType('image')">
-                    <div class="text-2xl font-bold text-pink-400">${imageCaptures.length}</div>
+                <div class="bg-dark border border-[#00e5ff]/30 rounded-xl p-3 cursor-pointer hover:border-[#00e5ff] transition-all" onclick="filterCapturesByType('image')">
+                    <div class="text-2xl font-bold text-[#00e5ff]">${imageCaptures.length}</div>
                     <div class="text-xs text-gray-400 mt-1">🖼️ Images</div>
                 </div>
                 <div class="bg-dark border border-red-500/30 rounded-xl p-3 cursor-pointer hover:border-red-500 transition-all" onclick="filterCapturesByType('video')">
