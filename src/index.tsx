@@ -1,7 +1,9 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-workers'
-import platformsData from '../platforms_data.json'
+import platformsDataRaw from '../platforms_data.json?raw'
+
+const platformsData = JSON.parse(platformsDataRaw)
 
 const app = new Hono()
 
