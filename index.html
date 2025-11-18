@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Command Center - Platform Embeds</title>
+    
+    <!-- CSP: Allow iframes from AI platform domains only -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline';
+        style-src 'self' 'unsafe-inline';
+        frame-src 
+            https://chatgpt.com
+            https://claude.ai
+            https://www.genspark.ai
+            https://gemini.google.com
+            https://copilot.microsoft.com
+            https://www.perplexity.ai
+            https://www.adobe.com
+            https://firefly.adobe.com
+            https://magai.co
+            https://app.magai.co
+            https://cursor.sh
+            https://www.canva.com
+            https://auth.openai.com
+            https://accounts.google.com
+            https://login.microsoft.com
+            https://auth.adobe.com;
+        connect-src 'self';
+    ">
+    
+    <!-- Preconnect hints for performance optimization -->
+    <link rel="preconnect" href="https://chatgpt.com" crossorigin>
+    <link rel="preconnect" href="https://claude.ai" crossorigin>
+    <link rel="preconnect" href="https://www.genspark.ai" crossorigin>
+    <link rel="preconnect" href="https://gemini.google.com" crossorigin>
+    <link rel="preconnect" href="https://copilot.microsoft.com" crossorigin>
+    <link rel="preconnect" href="https://www.perplexity.ai" crossorigin>
+    <link rel="preconnect" href="https://www.adobe.com" crossorigin>
+    <link rel="preconnect" href="https://firefly.adobe.com" crossorigin>
+    <link rel="preconnect" href="https://magai.co" crossorigin>
+    <link rel="preconnect" href="https://cursor.sh" crossorigin>
+    <link rel="preconnect" href="https://www.canva.com" crossorigin>
+    
+    <!-- DNS prefetch for auth endpoints -->
+    <link rel="dns-prefetch" href="https://auth.openai.com">
+    <link rel="dns-prefetch" href="https://accounts.google.com">
+    <link rel="dns-prefetch" href="https://login.microsoft.com">
+    <link rel="dns-prefetch" href="https://auth.adobe.com">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #e2e8f0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .embed-card {
+            background: rgba(30, 27, 75, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .embed-card:hover {
+            border-color: rgba(236, 72, 153, 0.5);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .embed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .embed-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .embed-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .embed-annotation {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid #f59e0b;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            font-family: 'Courier New', monospace;
+        }
+
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .embed-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .embed-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .meta-icon {
+            width: 16px;
+            height: 16px;
+            color: #8b5cf6;
+        }
+
+        /* JSON Configuration Section */
+        .config-section {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .config-header {
+            font-size: 1.5rem;
+            color: #f8fafc;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .config-description {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+        }
+
+        .json-key {
+            color: #8b5cf6;
+        }
+
+        .json-string {
+            color: #34d399;
+        }
+
+        .json-number {
+            color: #f59e0b;
+        }
+
+        .json-boolean {
+            color: #ec4899;
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .warning-title {
+            color: #fca5a5;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warning-text {
+            color: #fecaca;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 AI Command Center</h1>
+            <p class="subtitle">CSP-Aware Platform Embeds with Preconnect Optimization</p>
+        </header>
+
+        <div class="grid">
+            <!-- ========================================
+                 EMBED SLOT 1: ChatGPT Pro
+                 SWAP INSTRUCTIONS: Replace data-platform-id="1" 
+                 and update iframe src to any platform URL from 
+                 PLATFORM_URLS config below
+            ========================================= -->
+            <div class="embed-card" data-platform-id="1">
+                <div class="embed-header">
+                    <h2 class="embed-title">ChatGPT Pro</h2>
+                    <span class="embed-badge">$200/mo</span>
+                </div>
+                <div class="embed-annotation">
+                    🔧 SWAP: Change data-platform-id and iframe src to switch platforms
+                </div>
+                <div class="iframe-container">
+                    <iframe 
+                        src="https://chatgpt.com"
+                        title="ChatGPT Pro Dashboard"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+                <div class="embed-footer">
+                    <div class="embed-meta">
+                        <span class="meta-item">
+                            <svg class="meta-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                            GPT-5.1 Thinking
+                        </span>
+                        <span class="meta-item">🔒 Sandbox: scripts, same-origin, forms</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+                 EMBED SLOT 2: Claude Pro
+                 SWAP INSTRUCTIONS: Claude supports Artifacts
+                 hosting - ideal for instant app previews
+            ========================================= -->
+            <div class="embed-card" data-platform-id="2">
+                <div class="embed-header">
+                    <h2 class="embed-title">Claude Pro</h2>
+                    <span class="embed-badge">$20/mo</span>
+                </div>
+                <div class="embed-annotation">
+                    🔧 SWAP: Claude.ai supports Artifacts for instant hosting
+                </div>
+                <div class="iframe-container">
+                    <iframe 
+                        src="https://claude.ai"
+                        title="Claude Pro Dashboard"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+                <div class="embed-footer">
+                    <div class="embed-meta">
+                        <span class="meta-item">
+                            <svg class="meta-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            </svg>
+                            Claude Sonnet 4.5
+                        </span>
+                        <span class="meta-item">🎨 Artifacts: Instant Hosting</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+                 EMBED SLOT 3: GenSpark Plus
+                 SWAP INSTRUCTIONS: One-click deployment
+                 platform with AI Developer tool
+            ========================================= -->
+            <div class="embed-card" data-platform-id="3">
+                <div class="embed-header">
+                    <h2 class="embed-title">GenSpark Plus</h2>
+                    <span class="embed-badge">$20/mo</span>
+                </div>
+                <div class="embed-annotation">
+                    🔧 SWAP: GenSpark AI Developer publishes to live URLs
+                </div>
+                <div class="iframe-container">
+                    <iframe 
+                        src="https://www.genspark.ai"
+                        title="GenSpark Plus Dashboard"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+                <div class="embed-footer">
+                    <div class="embed-meta">
+                        <span class="meta-item">🚀 9 AI Models</span>
+                        <span class="meta-item">🌐 One-Click Publish</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+                 EMBED SLOT 4: Google One AI Premium
+                 SWAP INSTRUCTIONS: Gemini 2.5 Pro with
+                 Cloud Run & AppSheet deployment
+            ========================================= -->
+            <div class="embed-card" data-platform-id="4">
+                <div class="embed-header">
+                    <h2 class="embed-title">Google One AI Premium</h2>
+                    <span class="embed-badge">$20/mo</span>
+                </div>
+                <div class="embed-annotation">
+                    🔧 SWAP: Gemini with Cloud Run & AppSheet deployment
+                </div>
+                <div class="iframe-container">
+                    <iframe 
+                        src="https://gemini.google.com"
+                        title="Google Gemini Dashboard"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+                <div class="embed-footer">
+                    <div class="embed-meta">
+                        <span class="meta-item">☁️ Cloud Run Deploy</span>
+                        <span class="meta-item">📊 AppSheet Apps</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+                 EMBED SLOT 5: Perplexity Pro
+                 SWAP INSTRUCTIONS: Multi-model research
+                 platform with deep search capabilities
+            ========================================= -->
+            <div class="embed-card" data-platform-id="6">
+                <div class="embed-header">
+                    <h2 class="embed-title">Perplexity Pro</h2>
+                    <span class="embed-badge">$20/mo</span>
+                </div>
+                <div class="embed-annotation">
+                    🔧 SWAP: Research-focused with multi-model routing
+                </div>
+                <div class="iframe-container">
+                    <iframe 
+                        src="https://www.perplexity.ai"
+                        title="Perplexity Pro Dashboard"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+                <div class="embed-footer">
+                    <div class="embed-meta">
+                        <span class="meta-item">🔍 Deep Research</span>
+                        <span class="meta-item">🤖 6 AI Models</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================
+                 EMBED SLOT 6: Canva Business
+                 SWAP INSTRUCTIONS: Design platform with
+                 AI-powered tools and export capabilities
+            ========================================= -->
+            <div class="embed-card" data-platform-id="10">
+                <div class="embed-header">
+                    <h2 class="embed-title">Canva Business</h2>
+                    <span class="embed-badge">$120/yr</span>
+                </div>
+                <div class="embed-annotation">
+                    🔧 SWAP: Design platform with 100M+ assets & AI tools
+                </div>
+                <div class="iframe-container">
+                    <iframe 
+                        src="https://www.canva.com"
+                        title="Canva Business Dashboard"
+                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+                <div class="embed-footer">
+                    <div class="embed-meta">
+                        <span class="meta-item">🎨 AI Design</span>
+                        <span class="meta-item">📹 Video Editor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================
+             CONFIGURATION & COPY BLOCKS SECTION
+             All editable data as JSON for easy swapping
+        ============================================= -->
+        <div class="config-section">
+            <div class="config-header">
+                ⚙️ Configuration & Copy Blocks
+            </div>
+            
+            <div class="warning-box">
+                <div class="warning-title">
+                    ⚠️ Security Notice
+                </div>
+                <div class="warning-text">
+                    This HTML uses strict CSP (Content Security Policy) with frame-src restrictions. 
+                    When adding new platform URLs, update BOTH the CSP meta tag (line 11) AND the 
+                    PLATFORM_URLS config below. Test in incognito mode to verify CSP compliance.
+                </div>
+            </div>
+
+            <p class="config-description">
+                📋 <strong>Copy these JSON blocks to customize embeds:</strong><br>
+                • PLATFORM_URLS: Update iframe sources<br>
+                • PLATFORM_DATA: Display names, pricing, and categories<br>
+                • CSP_DOMAINS: Add to Content-Security-Policy if adding new platforms<br>
+                • PRECONNECT_HINTS: Update &lt;link rel="preconnect"&gt; tags for performance
+            </p>
+
+            <h3 style="color: #8b5cf6; margin-bottom: 1rem; font-size: 1.2rem;">🔗 PLATFORM_URLS</h3>
+            <pre id="platform-urls-json">
+{
+  "1": {
+    "url": "https://chatgpt.com",
+    "loginUrl": "https://auth.openai.com/authorize",
+    "description": "GPT-5.1 with thinking modes and DALL-E",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "2": {
+    "url": "https://claude.ai",
+    "loginUrl": "https://claude.ai/login",
+    "description": "Claude with Artifacts instant hosting",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "3": {
+    "url": "https://www.genspark.ai",
+    "loginUrl": "https://www.genspark.ai/auth/login",
+    "description": "Multi-AI orchestration with one-click deployment",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "4": {
+    "url": "https://gemini.google.com",
+    "loginUrl": "https://accounts.google.com",
+    "description": "Gemini 2.5 Pro with Google Workspace integration",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "5": {
+    "url": "https://copilot.microsoft.com",
+    "loginUrl": "https://login.microsoft.com",
+    "description": "Microsoft 365 Copilot with Office integration",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "6": {
+    "url": "https://www.perplexity.ai",
+    "loginUrl": "https://www.perplexity.ai/login",
+    "description": "Multi-model AI research with deep search",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "7": {
+    "url": "https://www.adobe.com/products/firefly.html",
+    "loginUrl": "https://auth.adobe.com",
+    "description": "Adobe Firefly commercial-safe image generation",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "8": {
+    "url": "https://magai.co",
+    "loginUrl": "https://app.magai.co/login",
+    "description": "50+ AI models orchestration platform",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "9": {
+    "url": "https://cursor.sh",
+    "loginUrl": "https://cursor.sh",
+    "description": "AI code editor with multi-agent planning",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  },
+  "10": {
+    "url": "https://www.canva.com",
+    "loginUrl": "https://www.canva.com/login",
+    "description": "Design platform with AI-powered tools",
+    "sandbox": "allow-scripts allow-same-origin allow-forms allow-popups"
+  }
+}</pre>
+
+            <h3 style="color: #8b5cf6; margin: 2rem 0 1rem; font-size: 1.2rem;">📊 PLATFORM_DATA</h3>
+            <pre id="platform-data-json">
+{
+  "1": {
+    "name": "ChatGPT Pro",
+    "pricing": "$200/month",
+    "category": "LLM / Chat AI",
+    "badge": "$200/mo",
+    "primaryModel": "GPT-5.1 Thinking",
+    "capabilities": ["Reasoning", "Coding", "DALL-E", "Canvas"]
+  },
+  "2": {
+    "name": "Claude Pro",
+    "pricing": "$20/month",
+    "category": "LLM / Chat AI",
+    "badge": "$20/mo",
+    "primaryModel": "Claude Sonnet 4.5",
+    "capabilities": ["Artifacts", "200K context", "Computer use"]
+  },
+  "3": {
+    "name": "GenSpark Plus",
+    "pricing": "$20/month",
+    "category": "Multi-AI Orchestration",
+    "badge": "$20/mo",
+    "primaryModel": "9 AI Models",
+    "capabilities": ["One-click publish", "AI Developer", "80+ tools"]
+  },
+  "4": {
+    "name": "Google One AI Premium",
+    "pricing": "$20/month",
+    "category": "Multi-AI Suite",
+    "badge": "$20/mo",
+    "primaryModel": "Gemini 2.5 Pro",
+    "capabilities": ["Cloud Run", "AppSheet", "2TB storage"]
+  },
+  "5": {
+    "name": "Microsoft 365 Copilot Pro",
+    "pricing": "$30/month",
+    "category": "Productivity Suite",
+    "badge": "$30/mo",
+    "primaryModel": "GPT-5.1 + Claude 4.5",
+    "capabilities": ["Office apps", "Agent Mode", "Designer"]
+  },
+  "6": {
+    "name": "Perplexity Pro",
+    "pricing": "$20/month",
+    "category": "AI Research",
+    "badge": "$20/mo",
+    "primaryModel": "Multi-model routing",
+    "capabilities": ["Deep Research", "Pro Search", "600+ searches/day"]
+  },
+  "7": {
+    "name": "Adobe Firefly + Express",
+    "pricing": "$60/month",
+    "category": "Image Generation",
+    "badge": "$60/mo",
+    "primaryModel": "Firefly Image 5",
+    "capabilities": ["Commercial-safe", "Generative fill", "Express"]
+  },
+  "8": {
+    "name": "Magai Pro",
+    "pricing": "$25/month",
+    "category": "Multi-AI Orchestration",
+    "badge": "$25/mo",
+    "primaryModel": "50+ AI models",
+    "capabilities": ["Workflows", "Team workspace", "MCP"]
+  },
+  "9": {
+    "name": "Cursor Pro",
+    "pricing": "$20/month",
+    "category": "AI Code Editor",
+    "badge": "$20/mo",
+    "primaryModel": "Claude Sonnet 4.5",
+    "capabilities": ["Composer", "Agent mode", "Voice mode"]
+  },
+  "10": {
+    "name": "Canva Business",
+    "pricing": "$120/year",
+    "category": "Design Platform",
+    "badge": "$120/yr",
+    "primaryModel": "Canva AI",
+    "capabilities": ["100M+ assets", "Video editor", "Brand Kit"]
+  }
+}</pre>
+
+            <h3 style="color: #8b5cf6; margin: 2rem 0 1rem; font-size: 1.2rem;">🔒 CSP_DOMAINS</h3>
+            <pre id="csp-domains-json">
+{
+  "description": "Content Security Policy frame-src domains. Add to CSP meta tag when adding new platforms.",
+  "domains": [
+    "https://chatgpt.com",
+    "https://claude.ai",
+    "https://www.genspark.ai",
+    "https://gemini.google.com",
+    "https://copilot.microsoft.com",
+    "https://www.perplexity.ai",
+    "https://www.adobe.com",
+    "https://firefly.adobe.com",
+    "https://magai.co",
+    "https://app.magai.co",
+    "https://cursor.sh",
+    "https://www.canva.com"
+  ],
+  "authDomains": [
+    "https://auth.openai.com",
+    "https://accounts.google.com",
+    "https://login.microsoft.com",
+    "https://auth.adobe.com"
+  ],
+  "instructions": "When adding a new platform: 1) Add domain to this list, 2) Update CSP meta tag frame-src, 3) Add preconnect link, 4) Update PLATFORM_URLS"
+}</pre>
+
+            <h3 style="color: #8b5cf6; margin: 2rem 0 1rem; font-size: 1.2rem;">⚡ PRECONNECT_HINTS</h3>
+            <pre id="preconnect-hints-json">
+{
+  "description": "DNS preconnect hints for performance optimization. Add as &lt;link rel='preconnect'&gt; tags.",
+  "primaryDomains": [
+    "https://chatgpt.com",
+    "https://claude.ai",
+    "https://www.genspark.ai",
+    "https://gemini.google.com",
+    "https://copilot.microsoft.com",
+    "https://www.perplexity.ai",
+    "https://www.adobe.com",
+    "https://firefly.adobe.com",
+    "https://magai.co",
+    "https://cursor.sh",
+    "https://www.canva.com"
+  ],
+  "dnsPrefetchOnly": [
+    "https://auth.openai.com",
+    "https://accounts.google.com",
+    "https://login.microsoft.com",
+    "https://auth.adobe.com"
+  ],
+  "performance": {
+    "preconnect": "Establishes early connection (DNS + TCP + TLS)",
+    "dnsPrefetch": "DNS resolution only (lighter weight)",
+    "recommendation": "Use preconnect for primary domains, dns-prefetch for auth domains"
+  }
+}</pre>
+
+            <h3 style="color: #8b5cf6; margin: 2rem 0 1rem; font-size: 1.2rem;">🛡️ IFRAME_SECURITY</h3>
+            <pre id="iframe-security-json">
+{
+  "description": "Security attributes for iframe embeds",
+  "sandbox": {
+    "recommended": "allow-scripts allow-same-origin allow-forms allow-popups",
+    "strict": "allow-scripts allow-forms",
+    "permissive": "allow-scripts allow-same-origin allow-forms allow-popups allow-modals",
+    "explanation": {
+      "allow-scripts": "Required for interactive platform UIs",
+      "allow-same-origin": "Allows iframe to access its own origin (needed for auth)",
+      "allow-forms": "Enables form submissions within iframe",
+      "allow-popups": "Allows OAuth/login popups (some platforms require this)"
+    }
+  },
+  "additionalAttributes": {
+    "loading": "lazy",
+    "referrerpolicy": "no-referrer-when-downgrade",
+    "credentialless": "Future-proof for anonymous iframe contexts"
+  },
+  "cspBestPractices": [
+    "Use frame-src to whitelist specific domains only",
+    "Avoid 'unsafe-inline' for scripts when possible",
+    "Keep default-src restrictive ('self' only)",
+    "Use nonce or hash for inline scripts if needed",
+    "Test CSP with browser DevTools console"
+  ]
+}</pre>
+
+            <h3 style="color: #8b5cf6; margin: 2rem 0 1rem; font-size: 1.2rem;">📝 SWAP_INSTRUCTIONS</h3>
+            <pre id="swap-instructions-json">
+{
+  "description": "Step-by-step guide to swap platform embeds",
+  "steps": [
+    {
+      "step": 1,
+      "action": "Choose platform ID from PLATFORM_DATA (1-10)",
+      "example": "Want to embed Magai Pro? Use platform ID: 8"
+    },
+    {
+      "step": 2,
+      "action": "Find the embed card in HTML (search for 'EMBED SLOT')",
+      "example": "Locate: <div class='embed-card' data-platform-id='1'>"
+    },
+    {
+      "step": 3,
+      "action": "Update data-platform-id attribute",
+      "example": "Change: data-platform-id='1' to data-platform-id='8'"
+    },
+    {
+      "step": 4,
+      "action": "Update iframe src from PLATFORM_URLS",
+      "example": "Change: src='https://chatgpt.com' to src='https://magai.co'"
+    },
+    {
+      "step": 5,
+      "action": "Update embed-title from PLATFORM_DATA",
+      "example": "Change: 'ChatGPT Pro' to 'Magai Pro'"
+    },
+    {
+      "step": 6,
+      "action": "Update embed-badge pricing",
+      "example": "Change: '$200/mo' to '$25/mo'"
+    },
+    {
+      "step": 7,
+      "action": "Update embed-annotation with swap instructions",
+      "example": "Change annotation to describe new platform capabilities"
+    },
+    {
+      "step": 8,
+      "action": "Verify CSP allows new domain (check CSP_DOMAINS)",
+      "example": "Ensure 'https://magai.co' is in frame-src CSP"
+    },
+    {
+      "step": 9,
+      "action": "Add preconnect if not present",
+      "example": "Add: <link rel='preconnect' href='https://magai.co' crossorigin>"
+    },
+    {
+      "step": 10,
+      "action": "Test in browser with DevTools Console",
+      "example": "Check for CSP violations or iframe load errors"
+    }
+  ],
+  "quickSwapTemplate": {
+    "html": "<div class='embed-card' data-platform-id='{PLATFORM_ID}'>\n  <div class='embed-header'>\n    <h2 class='embed-title'>{PLATFORM_NAME}</h2>\n    <span class='embed-badge'>{PRICING}</span>\n  </div>\n  <div class='embed-annotation'>\n    🔧 SWAP: {CUSTOM_ANNOTATION}\n  </div>\n  <div class='iframe-container'>\n    <iframe \n      src='{PLATFORM_URL}'\n      title='{PLATFORM_NAME} Dashboard'\n      sandbox='allow-scripts allow-same-origin allow-forms allow-popups'\n      loading='lazy'\n      referrerpolicy='no-referrer-when-downgrade'\n    ></iframe>\n  </div>\n  <div class='embed-footer'>\n    <div class='embed-meta'>\n      <span class='meta-item'>{CAPABILITY_1}</span>\n      <span class='meta-item'>{CAPABILITY_2}</span>\n    </div>\n  </div>\n</div>"
+  }
+}</pre>
+
+            <h3 style="color: #8b5cf6; margin: 2rem 0 1rem; font-size: 1.2rem;">🎨 COPY_BLOCKS</h3>
+            <pre id="copy-blocks-json">
+{
+  "description": "Reusable text snippets for platform embeds",
+  "annotations": {
+    "deployment": "🚀 SWAP: This platform supports one-click deployment",
+    "hosting": "🎨 SWAP: Instant hosting available - no setup required",
+    "research": "🔍 SWAP: Research-focused with multi-model capabilities",
+    "design": "🖼️ SWAP: Design platform with export capabilities",
+    "coding": "💻 SWAP: Development environment with live preview",
+    "orchestration": "🤖 SWAP: Multi-model orchestration platform",
+    "productivity": "📊 SWAP: Productivity suite with AI integration",
+    "enterprise": "☁️ SWAP: Enterprise deployment with database support"
+  },
+  "capabilities": {
+    "thinking": "🧠 Advanced Reasoning",
+    "artifacts": "🎨 Artifacts: Instant Hosting",
+    "deployment": "🚀 One-Click Deploy",
+    "cloudRun": "☁️ Cloud Run Deploy",
+    "appsheet": "📊 AppSheet Apps",
+    "research": "🔍 Deep Research",
+    "multiModel": "🤖 Multi-Model",
+    "api": "🔌 API Access",
+    "video": "📹 Video Editor",
+    "design": "🎨 AI Design",
+    "code": "💻 Code Agent",
+    "workflow": "⚙️ Custom Workflows"
+  },
+  "badges": {
+    "free": "FREE",
+    "tier1": "$20/mo",
+    "tier2": "$30/mo",
+    "tier3": "$60/mo",
+    "premium": "$200/mo",
+    "annual": "$120/yr"
+  }
+}</pre>
+        </div>
+    </div>
+
+    <script>
+        // Syntax highlighting for JSON blocks (optional enhancement)
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ AI Command Center loaded');
+            console.log('📊 Platform embeds:', document.querySelectorAll('.embed-card').length);
+            console.log('🔒 CSP active - check DevTools for violations');
+            
+            // Log iframe load status
+            document.querySelectorAll('iframe').forEach((iframe, idx) => {
+                iframe.addEventListener('load', () => {
+                    console.log(`✅ Iframe ${idx + 1} loaded:`, iframe.src);
+                });
+                
+                iframe.addEventListener('error', (e) => {
+                    console.error(`❌ Iframe ${idx + 1} failed:`, iframe.src, e);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
