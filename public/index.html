@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trusted Embeds Preview</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://player.vimeo.com; base-uri 'none'; form-action 'none';"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/app.js" type="module" defer></script>
+    <link rel="preconnect" href="https://www.youtube-nocookie.com" crossorigin />
+    <link rel="preconnect" href="https://player.vimeo.com" crossorigin />
+    <link rel="preconnect" href="https://i.ytimg.com" />
+  </head>
+  <body>
+    <header class="hero">
+      <p class="eyebrow">Preview Build</p>
+      <h1>Safer embed handoff for marketing teams</h1>
+      <p>
+        Every iframe below is locked down with sandboxing, scoped CSP, and clear annotations so you can
+        swap providers without reopening a security review.
+      </p>
+      <button type="button" class="cta">Request Access</button>
+    </header>
+
+    <main>
+      <section aria-labelledby="hero-embed">
+        <div class="section-heading">
+          <h2 id="hero-embed">Hero placement</h2>
+          <p>Primary fold embed with autoplay disabled and focus management hooks.</p>
+        </div>
+
+        <!-- Embed Slot: hero_video | Replace src with approved hero provider -->
+        <figure class="embed-frame" data-embed-slot="hero_video">
+          <iframe
+            title="Product teaser"
+            src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0"
+            loading="lazy"
+            decoding="async"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="encrypted-media; picture-in-picture"
+            csp="default-src 'none'; media-src https://www.youtube-nocookie.com; img-src https://i.ytimg.com; script-src 'none';"
+          ></iframe>
+          <figcaption>Hero video defaults to YouTube (nocookie). Swap per comment above.</figcaption>
+        </figure>
+      </section>
+
+      <section aria-labelledby="testimonial-embed">
+        <div class="section-heading">
+          <h2 id="testimonial-embed">Testimonial slot</h2>
+          <p>Use this for social proof or customer interviews.</p>
+        </div>
+
+        <!-- Embed Slot: testimonial_carousel | Replace iframe with alternate playlist -->
+        <figure class="embed-frame" data-embed-slot="testimonial_carousel">
+          <iframe
+            title="Customer testimonial reel"
+            src="https://player.vimeo.com/video/76979871?h=bf349d3c01"
+            loading="lazy"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="autoplay; fullscreen; picture-in-picture"
+            csp="default-src 'none'; media-src https://player.vimeo.com https://vod-progressive.akamaized.net; img-src https://i.vimeocdn.com; script-src 'none';"
+          ></iframe>
+          <figcaption>Vimeo embed with additional CSP to keep playback scoped.</figcaption>
+        </figure>
+      </section>
+
+      <section aria-labelledby="fallback-guidance">
+        <div class="section-heading">
+          <h2 id="fallback-guidance">Fallback guidance</h2>
+          <p>Provide alternative calls-to-action for users without iframe support.</p>
+        </div>
+
+        <div class="fallback-card">
+          <p>
+            If the embed fails CSP validation, we display the CTA banner automatically. You can replace
+            this copy in the JSON block below without modifying layout markup.
+          </p>
+          <noscript>
+            <p>Please enable JavaScript to view embeds; meanwhile, download the narrative deck.</p>
+          </noscript>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <small>© <span id="year"></span> Trusted Embeds. All rights reserved.</small>
+    </footer>
+
+    <script type="application/json" id="copy-blocks">
+      {
+        "hero": {
+          "eyebrow": "Preview Build",
+          "headline": "Safer embed handoff for marketing teams",
+          "body": "Every iframe below is locked down with sandboxing, scoped CSP, and clear annotations.",
+          "ctaLabel": "Request Access"
+        },
+        "sections": [
+          {
+            "id": "hero_video",
+            "title": "Hero placement",
+            "description": "Primary fold embed with autoplay disabled and focus management hooks."
+          },
+          {
+            "id": "testimonial_carousel",
+            "title": "Testimonial slot",
+            "description": "Use this for social proof or customer interviews."
+          }
+        ],
+        "fallback": {
+          "title": "Fallback guidance",
+          "copy": "If the embed fails CSP validation, we display the CTA banner automatically."
+        }
+      }
+    </script>
+  </body>
+</html>
