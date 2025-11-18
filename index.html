@@ -3,30 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Command Center - Platform Embeds</title>
+    <title>AI Command Center - Quick Launch</title>
     
-    <!-- CSP: Allow iframes from AI platform domains only -->
+    <!-- CSP: Secure policy for static page -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         script-src 'self' 'unsafe-inline';
         style-src 'self' 'unsafe-inline';
-        frame-src 
-            https://chatgpt.com
-            https://claude.ai
-            https://www.genspark.ai
-            https://gemini.google.com
-            https://copilot.microsoft.com
-            https://www.perplexity.ai
-            https://www.adobe.com
-            https://firefly.adobe.com
-            https://magai.co
-            https://app.magai.co
-            https://cursor.sh
-            https://www.canva.com
-            https://auth.openai.com
-            https://accounts.google.com
-            https://login.microsoft.com
-            https://auth.adobe.com;
         connect-src 'self';
     ">
     
@@ -105,12 +88,17 @@
             border: 1px solid rgba(139, 92, 246, 0.3);
             padding: 1.5rem;
             transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .embed-card:hover {
             border-color: rgba(236, 72, 153, 0.5);
             box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            background: rgba(30, 27, 75, 0.7);
         }
 
         .embed-header {
@@ -149,21 +137,52 @@
             font-family: 'Courier New', monospace;
         }
 
-        .iframe-container {
+        .launch-container {
             position: relative;
             width: 100%;
-            height: 400px;
+            padding: 3rem 2rem;
             background: rgba(15, 23, 42, 0.8);
             border-radius: 8px;
-            overflow: hidden;
             border: 1px solid rgba(71, 85, 105, 0.5);
+            text-align: center;
+            transition: all 0.3s ease;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .embed-card:hover .launch-container {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .launch-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
             display: block;
+        }
+
+        .launch-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .embed-card:hover .launch-button {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+        }
+
+        .launch-hint {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #94a3b8;
         }
 
         .embed-footer {
@@ -286,53 +305,49 @@
     <div class="container">
         <header>
             <h1>🎯 AI Command Center</h1>
-            <p class="subtitle">CSP-Aware Platform Embeds with Preconnect Optimization</p>
+            <p class="subtitle">Quick Launch Dashboard - Click any card to open platform</p>
         </header>
 
         <div class="grid">
             <!-- ========================================
-                 EMBED SLOT 1: ChatGPT Pro
-                 SWAP INSTRUCTIONS: Replace data-platform-id="1" 
-                 and update iframe src to any platform URL from 
-                 PLATFORM_URLS config below
+                 LAUNCH SLOT 1: ChatGPT Pro
+                 SWAP INSTRUCTIONS: Replace data-platform-url with 
+                 any platform URL from PLATFORM_URLS config below
             ========================================= -->
-            <div class="embed-card" data-platform-id="1">
+            <a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer" class="embed-card" data-platform-id="1">
                 <div class="embed-header">
                     <h2 class="embed-title">ChatGPT Pro</h2>
                     <span class="embed-badge">$200/mo</span>
                 </div>
                 <div class="embed-annotation">
-                    🔧 SWAP: Change data-platform-id and iframe src to switch platforms
+                    🔧 SWAP: Change href="https://chatgpt.com" to any platform URL
                 </div>
-                <div class="iframe-container">
-                    <iframe 
-                        src="https://chatgpt.com"
-                        title="ChatGPT Pro Dashboard"
-                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                <div class="launch-container">
+                    <span class="launch-icon">🤖</span>
+                    <div class="launch-button">
+                        <span>Launch Platform</span>
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                        </svg>
+                    </div>
+                    <p class="launch-hint">Opens in new tab</p>
                 </div>
                 <div class="embed-footer">
                     <div class="embed-meta">
-                        <span class="meta-item">
-                            <svg class="meta-icon" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                            </svg>
-                            GPT-5.1 Thinking
-                        </span>
-                        <span class="meta-item">🔒 Sandbox: scripts, same-origin, forms</span>
+                        <span class="meta-item">🧠 GPT-5.1 Thinking</span>
+                        <span class="meta-item">🎨 DALL-E 3</span>
+                        <span class="meta-item">📊 Data Analysis</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- ========================================
-                 EMBED SLOT 2: Claude Pro
+                 LAUNCH SLOT 2: Claude Pro
                  SWAP INSTRUCTIONS: Claude supports Artifacts
                  hosting - ideal for instant app previews
             ========================================= -->
-            <div class="embed-card" data-platform-id="2">
+            <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" class="embed-card" data-platform-id="2">
                 <div class="embed-header">
                     <h2 class="embed-title">Claude Pro</h2>
                     <span class="embed-badge">$20/mo</span>
@@ -340,34 +355,32 @@
                 <div class="embed-annotation">
                     🔧 SWAP: Claude.ai supports Artifacts for instant hosting
                 </div>
-                <div class="iframe-container">
-                    <iframe 
-                        src="https://claude.ai"
-                        title="Claude Pro Dashboard"
-                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                <div class="launch-container">
+                    <span class="launch-icon">🎨</span>
+                    <div class="launch-button">
+                        <span>Launch Platform</span>
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                        </svg>
+                    </div>
+                    <p class="launch-hint">Opens in new tab</p>
                 </div>
                 <div class="embed-footer">
                     <div class="embed-meta">
-                        <span class="meta-item">
-                            <svg class="meta-icon" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                            </svg>
-                            Claude Sonnet 4.5
-                        </span>
-                        <span class="meta-item">🎨 Artifacts: Instant Hosting</span>
+                        <span class="meta-item">💡 Claude Sonnet 4.5</span>
+                        <span class="meta-item">🎨 Artifacts Hosting</span>
+                        <span class="meta-item">📝 200K Context</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- ========================================
-                 EMBED SLOT 3: GenSpark Plus
+                 LAUNCH SLOT 3: GenSpark Plus
                  SWAP INSTRUCTIONS: One-click deployment
                  platform with AI Developer tool
             ========================================= -->
-            <div class="embed-card" data-platform-id="3">
+            <a href="https://www.genspark.ai" target="_blank" rel="noopener noreferrer" class="embed-card" data-platform-id="3">
                 <div class="embed-header">
                     <h2 class="embed-title">GenSpark Plus</h2>
                     <span class="embed-badge">$20/mo</span>
@@ -375,29 +388,32 @@
                 <div class="embed-annotation">
                     🔧 SWAP: GenSpark AI Developer publishes to live URLs
                 </div>
-                <div class="iframe-container">
-                    <iframe 
-                        src="https://www.genspark.ai"
-                        title="GenSpark Plus Dashboard"
-                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                <div class="launch-container">
+                    <span class="launch-icon">🚀</span>
+                    <div class="launch-button">
+                        <span>Launch Platform</span>
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                        </svg>
+                    </div>
+                    <p class="launch-hint">Opens in new tab</p>
                 </div>
                 <div class="embed-footer">
                     <div class="embed-meta">
                         <span class="meta-item">🚀 9 AI Models</span>
                         <span class="meta-item">🌐 One-Click Publish</span>
+                        <span class="meta-item">🛠️ 80+ Tools</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- ========================================
-                 EMBED SLOT 4: Google One AI Premium
+                 LAUNCH SLOT 4: Google One AI Premium
                  SWAP INSTRUCTIONS: Gemini 2.5 Pro with
                  Cloud Run & AppSheet deployment
             ========================================= -->
-            <div class="embed-card" data-platform-id="4">
+            <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="embed-card" data-platform-id="4">
                 <div class="embed-header">
                     <h2 class="embed-title">Google One AI Premium</h2>
                     <span class="embed-badge">$20/mo</span>
@@ -405,29 +421,32 @@
                 <div class="embed-annotation">
                     🔧 SWAP: Gemini with Cloud Run & AppSheet deployment
                 </div>
-                <div class="iframe-container">
-                    <iframe 
-                        src="https://gemini.google.com"
-                        title="Google Gemini Dashboard"
-                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                <div class="launch-container">
+                    <span class="launch-icon">☁️</span>
+                    <div class="launch-button">
+                        <span>Launch Platform</span>
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                        </svg>
+                    </div>
+                    <p class="launch-hint">Opens in new tab</p>
                 </div>
                 <div class="embed-footer">
                     <div class="embed-meta">
                         <span class="meta-item">☁️ Cloud Run Deploy</span>
                         <span class="meta-item">📊 AppSheet Apps</span>
+                        <span class="meta-item">💾 2TB Storage</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- ========================================
-                 EMBED SLOT 5: Perplexity Pro
+                 LAUNCH SLOT 5: Perplexity Pro
                  SWAP INSTRUCTIONS: Multi-model research
                  platform with deep search capabilities
             ========================================= -->
-            <div class="embed-card" data-platform-id="6">
+            <a href="https://www.perplexity.ai" target="_blank" rel="noopener noreferrer" class="embed-card" data-platform-id="6">
                 <div class="embed-header">
                     <h2 class="embed-title">Perplexity Pro</h2>
                     <span class="embed-badge">$20/mo</span>
@@ -435,29 +454,32 @@
                 <div class="embed-annotation">
                     🔧 SWAP: Research-focused with multi-model routing
                 </div>
-                <div class="iframe-container">
-                    <iframe 
-                        src="https://www.perplexity.ai"
-                        title="Perplexity Pro Dashboard"
-                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                <div class="launch-container">
+                    <span class="launch-icon">🔍</span>
+                    <div class="launch-button">
+                        <span>Launch Platform</span>
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                        </svg>
+                    </div>
+                    <p class="launch-hint">Opens in new tab</p>
                 </div>
                 <div class="embed-footer">
                     <div class="embed-meta">
                         <span class="meta-item">🔍 Deep Research</span>
                         <span class="meta-item">🤖 6 AI Models</span>
+                        <span class="meta-item">📚 600+ Searches/Day</span>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- ========================================
-                 EMBED SLOT 6: Canva Business
+                 LAUNCH SLOT 6: Canva Business
                  SWAP INSTRUCTIONS: Design platform with
                  AI-powered tools and export capabilities
             ========================================= -->
-            <div class="embed-card" data-platform-id="10">
+            <a href="https://www.canva.com" target="_blank" rel="noopener noreferrer" class="embed-card" data-platform-id="10">
                 <div class="embed-header">
                     <h2 class="embed-title">Canva Business</h2>
                     <span class="embed-badge">$120/yr</span>
@@ -465,22 +487,25 @@
                 <div class="embed-annotation">
                     🔧 SWAP: Design platform with 100M+ assets & AI tools
                 </div>
-                <div class="iframe-container">
-                    <iframe 
-                        src="https://www.canva.com"
-                        title="Canva Business Dashboard"
-                        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                    ></iframe>
+                <div class="launch-container">
+                    <span class="launch-icon">🎨</span>
+                    <div class="launch-button">
+                        <span>Launch Platform</span>
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                        </svg>
+                    </div>
+                    <p class="launch-hint">Opens in new tab</p>
                 </div>
                 <div class="embed-footer">
                     <div class="embed-meta">
                         <span class="meta-item">🎨 AI Design</span>
                         <span class="meta-item">📹 Video Editor</span>
+                        <span class="meta-item">💼 Brand Kit</span>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- ============================================
@@ -494,12 +519,12 @@
             
             <div class="warning-box">
                 <div class="warning-title">
-                    ⚠️ Security Notice
+                    ⚠️ Why No Iframes?
                 </div>
                 <div class="warning-text">
-                    This HTML uses strict CSP (Content Security Policy) with frame-src restrictions. 
-                    When adding new platform URLs, update BOTH the CSP meta tag (line 11) AND the 
-                    PLATFORM_URLS config below. Test in incognito mode to verify CSP compliance.
+                    Most AI platforms block iframe embedding (X-Frame-Options: DENY) for security. 
+                    This dashboard uses clickable cards that open platforms in new tabs instead. 
+                    Click any card to launch the platform - much more reliable than iframes!
                 </div>
             </div>
 
@@ -849,20 +874,28 @@
     </div>
 
     <script>
-        // Syntax highlighting for JSON blocks (optional enhancement)
+        // AI Command Center - Quick Launch Dashboard
         document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ AI Command Center loaded');
-            console.log('📊 Platform embeds:', document.querySelectorAll('.embed-card').length);
-            console.log('🔒 CSP active - check DevTools for violations');
+            console.log('🚀 Platform cards:', document.querySelectorAll('.embed-card').length);
+            console.log('🔒 CSP active - secure browsing enabled');
             
-            // Log iframe load status
-            document.querySelectorAll('iframe').forEach((iframe, idx) => {
-                iframe.addEventListener('load', () => {
-                    console.log(`✅ Iframe ${idx + 1} loaded:`, iframe.src);
+            // Add click analytics (optional)
+            document.querySelectorAll('.embed-card').forEach((card, idx) => {
+                card.addEventListener('click', (e) => {
+                    const platformName = card.querySelector('.embed-title').textContent;
+                    const platformUrl = card.getAttribute('href');
+                    console.log(`🚀 Launching: ${platformName} → ${platformUrl}`);
                 });
-                
-                iframe.addEventListener('error', (e) => {
-                    console.error(`❌ Iframe ${idx + 1} failed:`, iframe.src, e);
+            });
+
+            // Add keyboard navigation
+            document.querySelectorAll('.embed-card').forEach((card) => {
+                card.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
                 });
             });
         });
